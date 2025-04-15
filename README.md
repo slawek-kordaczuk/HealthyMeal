@@ -1,94 +1,69 @@
-# 10x Astro Starter
+# HealthyMeal
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+## Table of Contents
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Getting Started Locally](#getting-started-locally)
+- [Available Scripts](#available-scripts)
+- [Project Scope](#project-scope)
+- [Project Status](#project-status)
+- [License](#license)
+
+## Project Description
+HealthyMeal is a web application designed to empower users to customize recipes according to their unique dietary requirements. By integrating artificial intelligence (AI), the application suggests modifications to recipes based on individual preferences such as allergies, special diets (e.g., vegan, gluten-free, low carb), and ingredient choices. The platform supports user authentication, profile management, and secure password encryption (AES-256), ensuring a safe and personalized cooking experience.
 
 ## Tech Stack
+- **Frontend:** Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui
+- **Backend:** Supabase (PostgreSQL, authentication)
+- **AI Integration:** Openrouter.ai (supports multiple models like OpenAI, Anthropic, and more)
+- **CI/CD & Hosting:** GitHub Actions for CI/CD pipelines and deployment via DigitalOcean with Docker
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+## Getting Started Locally
+### Prerequisites
+- Node.js (version as specified in `.nvmrc`: 22.14.0)
+- npm
 
-## Prerequisites
-
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
-
-## Getting Started
-
+### Installation
 1. Clone the repository:
-
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
-
+   ```bash
+   git clone https://github.com/slawek-kordaczuk/HealthyMeal.git
+   cd healthymeal
+   ```
 2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Run the development server:
-
-```bash
-npm run dev
-```
-
-4. Build for production:
-
-```bash
-npm run build
-```
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
 ## Available Scripts
+- `npm run dev` - Starts the Astro development server.
+- `npm run build` - Builds the project for production.
+- `npm run preview` - Previews the production build.
+- `npm run astro` - Runs the Astro CLI.
+- `npm run lint` - Runs ESLint to analyze code quality.
+- `npm run lint:fix` - Automatically fixes linting errors.
+- `npm run format` - Formats code using Prettier.
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+## Project Scope
+HealthyMeal focuses on providing a core set of functionalities:
+- **Recipe Management (CRUD):** Create, view, edit, and delete recipes.
+- **User Account System:** Secure registration and login with encrypted passwords (AES-256).
+- **Profile & Preferences:** Configure dietary preferences and manage filters.
+- **AI-driven Recipe Modification:** Suggestions for recipe modifications based on user dietary preferences, pending user approval.
+- **Dynamic Filtering & Rating:** Ability to filter recipes and rate them, tracking various interaction metrics.
 
-## Project Structure
+Features excluded from the MVP include:
+- Importing recipes via URL
+- Advanced multimedia handling (e.g., images, videos)
+- Social sharing and community features
+- Detailed versioning and history of recipe modifications
+- Individual API key management for AI integration
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
-
-## AI Development Support
-
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
-
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
-
-### Cursor IDE
-
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+## Project Status
+The project is currently in the MVP stage, with core functionalities implemented. Future improvements will expand feature sets and enhance user experience.
 
 ## License
-
-MIT
+This project is licensed under the MIT License.
