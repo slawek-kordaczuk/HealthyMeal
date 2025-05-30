@@ -12,7 +12,8 @@ This table is managed by Supabase Auth
 - `created_at` TIMESTAMPTZ NOT NULL DEFAULT now()
 
 ### 2. preferences
-- `user_id` UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE
+- `id` INTEGER PRIMARY KEY
+- `user_id` UUID REFERENCES users(id) ON DELETE CASCADE
 - `diet_type` VARCHAR
 - `daily_calorie_requirement` INTEGER
 - `allergies` VARCHAR
@@ -26,34 +27,36 @@ This table is managed by Supabase Auth
 - `updated_at` TIMESTAMPTZ
 
 ### 3. recipes
-- `id` UUID PRIMARY KEY
+- `id` INTEGER PRIMARY KEY
 - `user_id` UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 - `name` VARCHAR NOT NULL UNIQUE
 - `rating` INTEGER CHECK (rating BETWEEN 1 AND 10)
 - `source` VARCHAR NOT NULL CHECK (source IN ('AI', 'manual'))
 - `recipe` JSONB NOT NULL
 - `created_at` TIMESTAMPTZ NOT NULL DEFAULT now()
+- `updated_at` TIMESTAMPTZ
 
 **Indeks:**
 - GIN index na kolumnie `recipe`:
   `CREATE INDEX idx_recipe_gin ON recipes USING gin(recipe);`
 
 ### 4. recipe_modifications
-- `id` UUID PRIMARY KEY
+- `id` INTEGER PRIMARY KEY
 - `user_id` UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+- `recipe_id` INTEGER PRIMARY KEY REFERENCES recipes(id) ON DELETE CASCADE
 - `original_recipe` JSONB NOT NULL
 - `modified_recipe` JSONB NOT NULL
 - `timestamp` TIMESTAMPTZ NOT NULL DEFAULT now()
 - `ai_model` VARCHAR NOT NULL
 
 ### 5. recipe_statistics
-- `recipe_id` UUID PRIMARY KEY REFERENCES recipes(id) ON DELETE CASCADE
+- `recipe_id` INTEGER PRIMARY KEY REFERENCES recipes(id) ON DELETE CASCADE
 - `search_count` INTEGER NOT NULL DEFAULT 0
 - `modification_count` INTEGER NOT NULL DEFAULT 0
 - `last_updated` TIMESTAMPTZ NOT NULL DEFAULT now()
 
 ### 6. recipe_modification_errors
-- `id` UUID PRIMARY KEY
+- `id` INTEGER PRIMARY KEY
 - `ai_model` VARCHAR NOT NULL
 - `recipe_text` TEXT NOT NULL
 - `error_code` INTEGER
@@ -63,7 +66,7 @@ This table is managed by Supabase Auth
 ## Relacje
 - Jeden użytkownik (`users`) ma relację 1:1 z `preferences` poprzez `user_id`.
 - Jeden użytkownik (`users`) może mieć wiele `recipes` (relacja 1:N między `users.id` a `recipes.user_id`).
-- Każdy przepis (`recipes`) może mieć powiązane rekordy w tabeli `recipe_modifications` (przechowywana jest historia modyfikacji).
+- Każdy przepis (`recipes`) może mieć wiele `recipe_modifications` (relacja 1:N między `recipes.id` a `recipe_modifications.recipe_id`).
 - Jeden użytkownik (`users`) może mieć wiele `recipe_modifications` (relacja 1:N między `users.id` a `recipe_modifications.user_id`).
 - Każdy przepis (`recipes`) ma powiązany rekord w `recipe_statistics` (relacja 1:1).
 - Tabela `recipe_modification_errors` służy niezależnie do logowania błędów związanych z modyfikacjami.

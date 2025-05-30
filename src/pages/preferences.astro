@@ -1,0 +1,22 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PreferencesForm from "../components/PreferencesForm";
+
+export const prerender = false;
+---
+
+<Layout title="Konfiguracja Preferencji - HealthyMeal">
+  <main class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-2xl">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Konfiguracja Preferencji</h1>
+        <p class="text-gray-600 mb-8">
+          Skonfiguruj swoje preferencje żywieniowe, aby otrzymywać spersonalizowane przepisy dostosowane do Twoich
+          potrzeb.
+        </p>
+
+        <PreferencesForm client:load />
+      </div>
+    </div>
+  </main>
+</Layout>

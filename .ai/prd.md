@@ -33,6 +33,7 @@ Użytkownicy mają problem z dostosowaniem dostępnych w sieci przepisów do swo
     - Użytkownik może utworzyć konto oraz zalogować się do systemu.
     - Autoryzacja umożliwia dostęp tylko do własnych danych, zgodnie z polityką RLS.
     - Proces rejestracji jest prosty i intuicyjny.
+    - Możliwość odzyskiwania hasła
 
 - ID: US-002
   Tytuł: Konfiguracja preferencji żywieniowych

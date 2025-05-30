@@ -1,11 +1,13 @@
 ---
 import "../styles/global.css";
+import { Toaster } from "../components/ui/sonner";
+import { NavigationMenuContainer } from "../components/NavigationMenuContainer";
 
 interface Props {
   title?: string;
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
+const { title = "HealthyMeal" } = Astro.props;
 ---
 
 <!doctype html>
@@ -18,7 +20,15 @@ const { title = "10x Astro Starter" } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <slot />
+    <header class="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div class="container mx-auto px-4">
+        <NavigationMenuContainer client:load />
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <Toaster client:load />
   </body>
 </html>
 
