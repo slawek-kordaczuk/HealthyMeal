@@ -16,6 +16,8 @@ HealthyMeal is a web application designed to empower users to customize recipes 
 - **Frontend:** Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui
 - **Backend:** Supabase (PostgreSQL, authentication)
 - **AI Integration:** Openrouter.ai (supports multiple models like OpenAI, Anthropic, and more)
+- **Testing:** Vitest (unit tests), React Testing Library, Playwright (e2e tests), Mock Service Worker (MSW)
+- **Code Quality:** ESLint, Prettier, TypeScript strict mode, Husky + lint-staged
 - **CI/CD & Hosting:** GitHub Actions for CI/CD pipelines and deployment via DigitalOcean with Docker
 
 ## Getting Started Locally
@@ -46,6 +48,9 @@ HealthyMeal is a web application designed to empower users to customize recipes 
 - `npm run lint` - Runs ESLint to analyze code quality.
 - `npm run lint:fix` - Automatically fixes linting errors.
 - `npm run format` - Formats code using Prettier.
+- `npm run test` - Runs unit tests using Vitest.
+- `npm run test:ui` - Runs unit tests with Vitest UI.
+- `npm run test:e2e` - Runs end-to-end tests using Playwright.
 
 ## Project Scope
 HealthyMeal focuses on providing a core set of functionalities:

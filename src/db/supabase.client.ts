@@ -43,18 +43,3 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
 };
 
 export type SupabaseClient = ReturnType<typeof createSupabaseServerInstance>;
-
-export type Session = Awaited<ReturnType<SupabaseClient["auth"]["getSession"]>>["data"]["session"];
-
-export async function getSession(context: { headers: Headers; cookies: AstroCookies }) {
-  const supabase = createSupabaseServerInstance(context);
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
-  if (error) {
-    console.error("Error fetching session:", error);
-    return null;
-  }
-  return session;
-}

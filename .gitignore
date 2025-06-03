@@ -22,3 +22,15 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Test results and coverage
+test-results/
+coverage/
+playwright-report/
+e2e/screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Vitest
+vitest.config.ts.timestamp-*
