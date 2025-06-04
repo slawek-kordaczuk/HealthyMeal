@@ -10,7 +10,7 @@ import { Input } from "../ui/input";
 import { Alert, AlertDescription } from "../ui/alert";
 
 // Zod schema for form validation
-const registerFormSchema = z
+export const registerFormSchema = z
   .object({
     email: z.string().email("Wprowadź poprawny adres email"),
     password: z

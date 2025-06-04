@@ -9,7 +9,7 @@ type PreferenceUpdate = Database["public"]["Tables"]["preferences"]["Update"];
 export class PreferencesService {
   constructor(private readonly supabase: SupabaseClient) {}
 
-  async createOrUpdatePreferences(data: PreferencesCommandDTO): Promise<PreferencesDTO> {
+  async createOrUpdatePreferences(data: Partial<PreferencesCommandDTO> & { userId: string }): Promise<PreferencesDTO> {
     const { userId } = data;
 
     // Filter out id field from preferences data

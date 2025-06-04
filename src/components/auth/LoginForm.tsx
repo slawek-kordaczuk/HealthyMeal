@@ -17,6 +17,9 @@ const loginFormSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
 
+// Export schema for testing purposes
+export { loginFormSchema };
+
 interface LoginFormProps {
   onSuccess?: () => void;
   onNavigateToRegister?: () => void;
