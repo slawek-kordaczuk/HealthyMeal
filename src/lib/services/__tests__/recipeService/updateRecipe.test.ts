@@ -11,6 +11,14 @@ import {
   mockConstraintError,
 } from "./shared-mocks";
 
+// Helper function to create mock for name uniqueness check
+const createNameUniquenessCheckMock = (hasConflict = false) => ({
+  select: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  single: vi.fn().mockResolvedValue({ data: hasConflict ? { id: 999 } : null, error: null }),
+});
+
 describe("RecipeService - updateRecipe", () => {
   let recipeService: RecipeService;
   let mockSupabase: Partial<SupabaseClient>;
@@ -57,6 +65,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       // Mock the update query
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
@@ -84,10 +95,11 @@ describe("RecipeService - updateRecipe", () => {
       mockSupabase.from = vi
         .fn()
         .mockReturnValueOnce(mockSelectQuery) // First call for fetching existing recipe
-        .mockReturnValueOnce(mockModHistoryQuery) // Second call for modification history
-        .mockReturnValueOnce(mockStatsSelectQuery) // Third call for stats select
-        .mockReturnValueOnce(mockStatsUpsertQuery) // Fourth call for stats upsert
-        .mockReturnValueOnce(mockUpdateQuery); // Fifth call for update
+        .mockReturnValueOnce(mockNameCheckQuery) // Second call for name uniqueness check
+        .mockReturnValueOnce(mockModHistoryQuery) // Third call for modification history
+        .mockReturnValueOnce(mockStatsSelectQuery) // Fourth call for stats select
+        .mockReturnValueOnce(mockStatsUpsertQuery) // Fifth call for stats upsert
+        .mockReturnValueOnce(mockUpdateQuery); // Sixth call for update
 
       // Act
       const result = await recipeService.updateRecipe(1, mockUserId, updateData);
@@ -96,6 +108,10 @@ describe("RecipeService - updateRecipe", () => {
       expect(result).toEqual(updatedRecipe);
       expect(mockSelectQuery.select).toHaveBeenCalledWith("*");
       expect(mockSelectQuery.eq).toHaveBeenCalledWith("id", 1);
+      expect(mockNameCheckQuery.select).toHaveBeenCalledWith("id");
+      expect(mockNameCheckQuery.eq).toHaveBeenCalledWith("name", "Updated Recipe Name");
+      expect(mockNameCheckQuery.eq).toHaveBeenCalledWith("user_id", mockUserId);
+      expect(mockNameCheckQuery.neq).toHaveBeenCalledWith("id", 1);
       expect(mockUpdateQuery.update).toHaveBeenCalled();
       expect(mockUpdateQuery.eq).toHaveBeenCalledWith("id", 1);
     });
@@ -119,6 +135,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       // Mock the update query (no recipe modification, so no history)
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
@@ -130,7 +149,8 @@ describe("RecipeService - updateRecipe", () => {
       mockSupabase.from = vi
         .fn()
         .mockReturnValueOnce(mockSelectQuery) // First call for fetching existing recipe
-        .mockReturnValueOnce(mockUpdateQuery); // Second call for update
+        .mockReturnValueOnce(mockNameCheckQuery) // Second call for name uniqueness check
+        .mockReturnValueOnce(mockUpdateQuery); // Third call for update
 
       // Act
       const result = await recipeService.updateRecipe(1, mockUserId, updateData);
@@ -139,6 +159,10 @@ describe("RecipeService - updateRecipe", () => {
       expect(result).toEqual(updatedRecipe);
       expect(mockSelectQuery.select).toHaveBeenCalledWith("*");
       expect(mockSelectQuery.eq).toHaveBeenCalledWith("id", 1);
+      expect(mockNameCheckQuery.select).toHaveBeenCalledWith("id");
+      expect(mockNameCheckQuery.eq).toHaveBeenCalledWith("name", "New Recipe Name");
+      expect(mockNameCheckQuery.eq).toHaveBeenCalledWith("user_id", mockUserId);
+      expect(mockNameCheckQuery.neq).toHaveBeenCalledWith("id", 1);
     });
 
     it("should update recipe with rating only", async () => {
@@ -287,6 +311,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -294,7 +321,11 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingRecipe, error: null }),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act
       await recipeService.updateRecipe(1, mockUserId, updateData);
@@ -364,6 +395,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -371,7 +405,11 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingRecipe, error: null }),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act
       await recipeService.updateRecipe(1, mockUserId, updateData);
@@ -460,6 +498,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -467,13 +508,17 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: updatedRecipe, error: null }),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act
       const result = await recipeService.updateRecipe(1, mockUserId, updateData);
 
       // Assert
-      expect(result.name).toBe("Coq au Vin & Rösti (Chef's Special) - 2024 Edition!");
+      expect(result).toEqual(updatedRecipe);
       expect(mockUpdateQuery.update).toHaveBeenCalledWith(expectedUpdateData);
     });
 
@@ -528,6 +573,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockModHistoryQuery = {
         insert: vi.fn().mockResolvedValue({ error: null }),
       };
@@ -552,6 +600,7 @@ describe("RecipeService - updateRecipe", () => {
       mockSupabase.from = vi
         .fn()
         .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
         .mockReturnValueOnce(mockModHistoryQuery)
         .mockReturnValueOnce(mockStatsSelectQuery)
         .mockReturnValueOnce(mockStatsUpsertQuery)
@@ -599,6 +648,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -606,7 +658,11 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: null, error: mockDatabaseError }),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act & Assert
       await expect(recipeService.updateRecipe(1, mockUserId, updateData)).rejects.toThrow("Failed to update recipe");
@@ -623,6 +679,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -630,7 +689,11 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockRejectedValue(networkError),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act & Assert
       await expect(recipeService.updateRecipe(1, mockUserId, updateData)).rejects.toThrow("Network connection lost");
@@ -646,6 +709,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -653,7 +719,11 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: null, error: mockConstraintError }),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act & Assert
       await expect(recipeService.updateRecipe(1, mockUserId, updateData)).rejects.toThrow("Failed to update recipe");
@@ -675,6 +745,27 @@ describe("RecipeService - updateRecipe", () => {
       // Act & Assert - Currently the implementation has a bug where it doesn't check for null data
       await expect(recipeService.updateRecipe(invalidRecipeId, mockUserId, updateData)).rejects.toThrow(
         "Cannot read properties of null"
+      );
+    });
+
+    it("should throw error when recipe name already exists for user", async () => {
+      // Arrange
+      const updateData: UpdateRecipeCommand = { name: "Existing Recipe Name" };
+
+      const mockSelectQuery = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
+      };
+
+      // Mock the name uniqueness check (conflict detected)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(true);
+
+      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockNameCheckQuery);
+
+      // Act & Assert
+      await expect(recipeService.updateRecipe(1, mockUserId, updateData)).rejects.toThrow(
+        "You already have a recipe with this name"
       );
     });
 
@@ -711,6 +802,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockModHistoryQuery = {
         insert: vi.fn().mockResolvedValue({ error: null }),
       };
@@ -735,10 +829,11 @@ describe("RecipeService - updateRecipe", () => {
       mockSupabase.from = vi
         .fn()
         .mockReturnValueOnce(mockSelectQuery) // 1. Fetch existing recipe
-        .mockReturnValueOnce(mockModHistoryQuery) // 2. Create modification history
-        .mockReturnValueOnce(mockStatsSelectQuery) // 3. Get current stats
-        .mockReturnValueOnce(mockStatsUpsertQuery) // 4. Update stats
-        .mockReturnValueOnce(mockUpdateQuery); // 5. Update recipe
+        .mockReturnValueOnce(mockNameCheckQuery) // 2. Check name uniqueness
+        .mockReturnValueOnce(mockModHistoryQuery) // 3. Create modification history
+        .mockReturnValueOnce(mockStatsSelectQuery) // 4. Get current stats
+        .mockReturnValueOnce(mockStatsUpsertQuery) // 5. Update stats
+        .mockReturnValueOnce(mockUpdateQuery); // 6. Update recipe
 
       // Act
       await recipeService.updateRecipe(1, mockUserId, updateData);
@@ -747,6 +842,10 @@ describe("RecipeService - updateRecipe", () => {
       expect(mockSupabase.from).toHaveBeenCalledWith("recipes");
       expect(mockSelectQuery.select).toHaveBeenCalledWith("*");
       expect(mockSelectQuery.eq).toHaveBeenCalledWith("id", 1);
+      expect(mockNameCheckQuery.select).toHaveBeenCalledWith("id");
+      expect(mockNameCheckQuery.eq).toHaveBeenCalledWith("name", "Integration Test Update");
+      expect(mockNameCheckQuery.eq).toHaveBeenCalledWith("user_id", mockUserId);
+      expect(mockNameCheckQuery.neq).toHaveBeenCalledWith("id", 1);
       expect(mockUpdateQuery.update).toHaveBeenCalled();
       expect(mockUpdateQuery.eq).toHaveBeenCalledTimes(1); // Only id, not user_id
       expect(mockUpdateQuery.select).toHaveBeenCalled();
@@ -835,6 +934,9 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: mockExistingDbRecipe, error: null }),
       };
 
+      // Mock the name uniqueness check (no conflict)
+      const mockNameCheckQuery = createNameUniquenessCheckMock(false);
+
       const mockUpdateQuery = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -842,7 +944,11 @@ describe("RecipeService - updateRecipe", () => {
         single: vi.fn().mockResolvedValue({ data: null, error: optimisticLockError }),
       };
 
-      mockSupabase.from = vi.fn().mockReturnValueOnce(mockSelectQuery).mockReturnValueOnce(mockUpdateQuery);
+      mockSupabase.from = vi
+        .fn()
+        .mockReturnValueOnce(mockSelectQuery)
+        .mockReturnValueOnce(mockNameCheckQuery)
+        .mockReturnValueOnce(mockUpdateQuery);
 
       // Act & Assert
       await expect(recipeService.updateRecipe(1, mockUserId, updateData)).rejects.toThrow("Failed to update recipe");

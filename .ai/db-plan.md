@@ -29,7 +29,7 @@ This table is managed by Supabase Auth
 ### 3. recipes
 - `id` INTEGER PRIMARY KEY
 - `user_id` UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
-- `name` VARCHAR NOT NULL UNIQUE
+- `name` VARCHAR NOT NULL
 - `rating` INTEGER CHECK (rating BETWEEN 1 AND 10)
 - `source` VARCHAR NOT NULL CHECK (source IN ('AI', 'manual'))
 - `recipe` JSONB NOT NULL
@@ -39,6 +39,8 @@ This table is managed by Supabase Auth
 **Indeks:**
 - GIN index na kolumnie `recipe`:
   `CREATE INDEX idx_recipe_gin ON recipes USING gin(recipe);`
+- Unique composite index na parze `(name, user_id)`:
+  `CREATE UNIQUE INDEX idx_recipes_name_user_unique ON recipes(name, user_id);`
 
 ### 4. recipe_modifications
 - `id` INTEGER PRIMARY KEY
@@ -73,7 +75,7 @@ This table is managed by Supabase Auth
 
 ## Indeksy
 - Unikalny indeks na `email` w tabeli `users` (narzucony przez constraint UNIQUE).
-- Unikalny indeks na `name` w tabeli `recipes`.
+- Unique composite index na parze `(name, user_id)` w tabeli `recipes`.
 - GIN index na kolumnie `recipe` w tabeli `recipes`:
   `CREATE INDEX idx_recipe_gin ON recipes USING gin(recipe);`
 

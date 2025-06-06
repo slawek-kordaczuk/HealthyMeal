@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { RecipeModificationService } from "../../../lib/services/recipeModificationService";
+import { RecipeModificationService } from "../../../lib/services/recipeAiModificationService";
 
 // Disable prerendering for this API route
 export const prerender = false;

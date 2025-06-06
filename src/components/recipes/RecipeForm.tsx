@@ -2,24 +2,24 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { usePreferences } from "./hooks/usePreferences";
+import { usePreferences } from "../hooks/usePreferences";
 import type {
   CreateRecipeCommand,
   RecipeDTO,
   RecipeModificationCommand,
   RecipeModificationResponseDTO,
-} from "../types/types";
+} from "../../types/types";
 
 // Shadcn/ui components
-import { Button } from "./ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import { Alert, AlertDescription } from "./ui/alert";
+import { Button } from "../ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Alert, AlertDescription } from "../ui/alert";
 
 // Sub-components
-import AIPreviewSection from "./AIPreviewSection";
-import ConfirmAIModificationModal from "./ConfirmAIModificationModal";
+import AIPreviewSection from "../AIPreviewSection";
+import ConfirmAIModificationModal from "../ConfirmAIModificationModal";
 
 // Zod schema for form validation
 const recipeFormSchema = z.object({

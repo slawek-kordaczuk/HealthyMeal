@@ -47,12 +47,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Check if recipe name already exists for this user
     const recipeService = new RecipeService(locals.supabase);
-    const nameExists = await recipeService.checkNameExists(command.name);
+    const nameExists = await recipeService.checkNameExists(command.name, locals.user.id);
 
     if (nameExists) {
       return new Response(
         JSON.stringify({
-          error: "Recipe with this name already exists",
+          error: "You already have a recipe with this name",
         }),
         {
           status: 409,

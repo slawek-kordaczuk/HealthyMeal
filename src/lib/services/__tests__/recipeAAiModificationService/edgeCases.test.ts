@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type MockedFunction } from "vitest";
-import { RecipeModificationService } from "../../recipeModificationService";
+import { RecipeModificationService } from "../../recipeAiModificationService";
 import { PreferencesService } from "../../preferencesService";
 import { OpenRouterService } from "../../OpenRouterService";
 import type { SupabaseClient } from "@supabase/supabase-js";

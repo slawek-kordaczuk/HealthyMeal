@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import type { RecipeFormValues } from "../RecipeForm";
+import type { RecipeFormValues } from "../recipes/RecipeForm";
 
 // Mock fetch globally
 const mockFetch = vi.fn();

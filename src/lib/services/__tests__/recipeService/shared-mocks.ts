@@ -64,11 +64,13 @@ export function createMockSupabase(): Partial<SupabaseClient> {
 export const createMockQueryBuilder = () => ({
   select: vi.fn().mockReturnThis(),
   eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
   or: vi.fn().mockReturnThis(),
   order: vi.fn().mockReturnThis(),
   range: vi.fn().mockReturnThis(),
   insert: vi.fn().mockReturnThis(),
   update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
   single: vi.fn(),
   upsert: vi.fn(),
 });

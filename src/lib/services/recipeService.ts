@@ -59,8 +59,8 @@ export class RecipeService {
     };
   }
 
-  async checkNameExists(name: string): Promise<boolean> {
-    const { data } = await this.supabase.from("recipes").select("id").eq("name", name).single();
+  async checkNameExists(name: string, userId: string): Promise<boolean> {
+    const { data } = await this.supabase.from("recipes").select("id").eq("name", name).eq("user_id", userId).single();
     return !!data;
   }
 
@@ -103,13 +103,28 @@ export class RecipeService {
       throw new UnauthorizedError();
     }
 
-    // 3. Prepare update data with timestamp
+    // 3. Check name uniqueness if name is being updated
+    if (updateData.name && updateData.name !== existingRecipe.name) {
+      const { data: nameConflict } = await this.supabase
+        .from("recipes")
+        .select("id")
+        .eq("name", updateData.name)
+        .eq("user_id", userId)
+        .neq("id", recipeId)
+        .single();
+
+      if (nameConflict) {
+        throw new Error("You already have a recipe with this name");
+      }
+    }
+
+    // 4. Prepare update data with timestamp
     const updateFields: RecipeUpdate = {
       ...updateData,
       updated_at: new Date().toISOString(),
     };
 
-    // 4. Create modification history record if recipe content is being modified
+    // 5. Create modification history record if recipe content is being modified
     if (updateData.recipe) {
       const modificationData: RecipeModification = {
         recipe_id: recipeId,
@@ -141,7 +156,7 @@ export class RecipeService {
       await this.supabase.from("recipe_statistics").upsert(statisticsData);
     }
 
-    // 5. Update the recipe
+    // 6. Update the recipe
     const { data: updatedRecipe, error: updateError } = await this.supabase
       .from("recipes")
       .update(updateFields)
