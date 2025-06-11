@@ -71,6 +71,8 @@ export default function LoginForm({
 
       // Login successful
       if (onSuccess) {
+        // Emit custom event to notify navigation component
+        window.dispatchEvent(new CustomEvent("authChange"));
         onSuccess();
       }
     } catch (err) {
@@ -84,13 +86,13 @@ export default function LoginForm({
   return (
     <div className="space-y-6">
       {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+        <Alert variant="destructive" data-testid="login-error-alert">
+          <AlertDescription data-testid="login-error-message">{error}</AlertDescription>
         </Alert>
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" data-testid="login-form">
           <FormField
             control={form.control}
             name="email"
@@ -98,7 +100,13 @@ export default function LoginForm({
               <FormItem>
                 <FormLabel>Adres email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="wprowadz@email.com" disabled={isLoading} {...field} />
+                  <Input
+                    type="email"
+                    placeholder="wprowadz@email.com"
+                    disabled={isLoading}
+                    data-testid="login-email-input"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -112,14 +120,20 @@ export default function LoginForm({
               <FormItem>
                 <FormLabel>Hasło</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Wprowadź hasło" disabled={isLoading} {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Wprowadź hasło"
+                    disabled={isLoading}
+                    data-testid="login-password-input"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button type="submit" disabled={isLoading} className="w-full">
+          <Button type="submit" disabled={isLoading} className="w-full" data-testid="login-submit-button">
             {isLoading ? "Logowanie..." : "Zaloguj się"}
           </Button>
         </form>
@@ -131,6 +145,7 @@ export default function LoginForm({
           onClick={onNavigateToRecover}
           disabled={isLoading}
           className="text-blue-600 hover:text-blue-500 underline disabled:opacity-50"
+          data-testid="login-forgot-password-link"
         >
           Zapomniałeś hasła?
         </button>
@@ -142,6 +157,7 @@ export default function LoginForm({
             onClick={onNavigateToRegister}
             disabled={isLoading}
             className="text-blue-600 hover:text-blue-500 underline disabled:opacity-50"
+            data-testid="login-register-link"
           >
             Zarejestruj się
           </button>
