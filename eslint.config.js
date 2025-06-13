@@ -57,6 +57,20 @@ const reactConfig = tseslint.config({
 });
 
 export default tseslint.config(
+  // Ignores - explicit ignoring of build outputs and generated files
+  {
+    ignores: [
+      "dist/**",
+      "html/**",
+      ".astro/**",
+      "node_modules/**",
+      "test-results/**",
+      "coverage/**",
+      "playwright-report/**",
+      "**/*.config.js.map",
+      "**/*.d.ts.map",
+    ],
+  },
   includeIgnoreFile(gitignorePath),
   baseConfig,
   jsxA11yConfig,
