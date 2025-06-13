@@ -74,8 +74,13 @@ jobs:
         with:
           name: node-modules
       
+      - name: Make node_modules executable
+        run: chmod +x node_modules/.bin/*
+      
       - name: Build for production
-        run: npm run build
+        run: |
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          npm run build
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
