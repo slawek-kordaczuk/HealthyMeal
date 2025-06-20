@@ -1,4 +1,4 @@
-# Dokumentacja komponentów autentykacji HealthyMeal
+# Dokumentacja komponentów autentykacji w aplikacji HealthyMeal
 
 ## Przegląd
 
