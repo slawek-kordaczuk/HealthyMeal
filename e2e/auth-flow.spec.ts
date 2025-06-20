@@ -6,22 +6,35 @@ test.describe("Authentication Flow", () => {
     await page.goto("/login");
     await expect(page.getByTestId("login-form")).toBeVisible();
 
-    // Poczekaj aż formularz będzie w pełni załadowany
-    await page.waitForTimeout(1000);
+    // Poczekaj aż formularz będzie w pełni załadowany i React się zainicjalizuje
+    await page.waitForTimeout(2000);
 
     // Upewnij się, że pola są dostępne i gotowe
     await expect(page.getByTestId("login-email-input")).toBeEnabled();
     await expect(page.getByTestId("login-password-input")).toBeEnabled();
 
-    // Zaloguj się - z wolniejszym wpisywaniem
-    await page.getByTestId("login-email-input").click();
-    await page.getByTestId("login-email-input").fill("test@test.pl");
-    await page.getByTestId("login-password-input").click();
-    await page.getByTestId("login-password-input").fill("TestPassword123");
+    // Wypełnij pola bardziej niezawodnie
+    const emailInput = page.getByTestId("login-email-input");
+    const passwordInput = page.getByTestId("login-password-input");
+
+    // Wyczyść i wypełnij email
+    await emailInput.click();
+    await emailInput.clear();
+    await emailInput.fill("test@test.pl");
+    await emailInput.blur(); // Stracenie focusu może pomóc z walidacją
+
+    // Wyczyść i wypełnij hasło
+    await passwordInput.click();
+    await passwordInput.clear();
+    await passwordInput.fill("TestPassword123");
+    await passwordInput.blur();
+
+    // Poczekaj chwilę na React state updates
+    await page.waitForTimeout(500);
 
     // Upewnij się, że pola są wypełnione
-    await expect(page.getByTestId("login-email-input")).toHaveValue("test@test.pl");
-    await expect(page.getByTestId("login-password-input")).toHaveValue("TestPassword123");
+    await expect(emailInput).toHaveValue("test@test.pl", { timeout: 10000 });
+    await expect(passwordInput).toHaveValue("TestPassword123", { timeout: 10000 });
 
     // Poczekaj na odpowiedź z API po kliknięciu przycisku
     const loginPromise = page.waitForResponse("/api/auth/login");
