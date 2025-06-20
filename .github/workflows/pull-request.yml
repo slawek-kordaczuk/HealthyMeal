@@ -1,0 +1,145 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          # Wyłączam cache npm z powodu problemu z rollup
+
+      - name: Remove package-lock and node_modules (rollup bug workaround)
+        run: |
+          rm -rf package-lock.json node_modules
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Upload package-lock for consistent dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-lock
+          path: package-lock.json
+          retention-days: 1
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Check code formatting
+        run: npm run format -- --check
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download package-lock from lint job
+        uses: actions/download-artifact@v4
+        with:
+          name: package-lock
+
+      - name: Install dependencies using consistent package-lock
+        run: npm ci
+
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload unit test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: coverage/
+          retention-days: 30
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    environment: integration
+    env:
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Download package-lock from lint job
+        uses: actions/download-artifact@v4
+        with:
+          name: package-lock
+
+      - name: Install dependencies using consistent package-lock
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+
+  status-comment:
+    name: Status Comment
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, e2e-tests]
+    if: always() && needs.unit-tests.result == 'success' && needs.e2e-tests.result == 'success'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment PR Success
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { context } = require('@actions/github');
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ **All checks passed successfully!**
+              
+              - ✅ Code linting and formatting completed
+              - ✅ Unit tests passed with coverage
+              - ✅ E2E tests completed successfully
+              
+              Your pull request is ready for review! 🚀`
+            }); 

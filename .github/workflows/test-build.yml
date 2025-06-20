@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   # Uruchamianie po aktualizacji master brancha
   push:
-    branches: [ master ]
+    branches: [ main ]
   
   # Możliwość uruchamiania manualnego
   workflow_dispatch:
