@@ -130,10 +130,16 @@ export default function RecipeListContainer() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" data-testid="recipes-error-container">
         <div className="text-center">
-          <p className="text-lg text-red-600 mb-4">{error}</p>
-          <button onClick={refreshRecipes} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <p className="text-lg text-red-600 mb-4" data-testid="recipes-error-message">
+            {error}
+          </p>
+          <button
+            onClick={refreshRecipes}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            data-testid="recipes-retry-button"
+          >
             Spróbuj ponownie
           </button>
         </div>
@@ -142,7 +148,7 @@ export default function RecipeListContainer() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="recipe-list-container">
       {/* Search Input */}
       <RecipeSearchInput
         searchQuery={filters.searchTerm}
@@ -152,8 +158,10 @@ export default function RecipeListContainer() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center min-h-[200px]">
-          <div className="text-lg">Ładowanie przepisów...</div>
+        <div className="flex items-center justify-center min-h-[200px]" data-testid="recipes-loading-container">
+          <div className="text-lg" data-testid="recipes-loading-message">
+            Ładowanie przepisów...
+          </div>
         </div>
       )}
 

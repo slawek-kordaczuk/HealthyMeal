@@ -126,7 +126,7 @@ export default function RecipeForm() {
       aiModifiedContent: null,
     });
     setError(null);
-    setSuccessMessage(null);
+    // Don't reset success message here - let it show to the user
   };
 
   const handleSaveRecipe = async (values: RecipeFormValues, source: "manual" | "AI" = "manual") => {
@@ -289,10 +289,14 @@ export default function RecipeForm() {
   };
 
   const onSubmit = async (values: RecipeFormValues) => {
+    // Clear any existing success message when starting a new action
+    setSuccessMessage(null);
     await handleSaveRecipe(values, "manual");
   };
 
   const onSubmitWithAI = async () => {
+    // Clear any existing success message when starting a new action
+    setSuccessMessage(null);
     const values = form.getValues();
     const isValid = await form.trigger();
 
@@ -332,31 +336,33 @@ export default function RecipeForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="recipe-form-container">
       {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+        <Alert variant="destructive" data-testid="recipe-form-error-alert">
+          <AlertDescription data-testid="recipe-form-error-message">{error}</AlertDescription>
         </Alert>
       )}
 
       {successMessage && (
-        <Alert>
-          <AlertDescription className="text-green-700">{successMessage}</AlertDescription>
+        <Alert data-testid="recipe-form-success-alert">
+          <AlertDescription className="text-green-700" data-testid="recipe-form-success-message">
+            {successMessage}
+          </AlertDescription>
         </Alert>
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="recipe-form">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem data-testid="recipe-name-field">
                 <FormLabel>Nazwa przepisu</FormLabel>
                 <FormControl>
-                  <Input placeholder="Wprowadź nazwę przepisu" {...field} />
+                  <Input placeholder="Wprowadź nazwę przepisu" {...field} data-testid="recipe-name-input" />
                 </FormControl>
-                <FormMessage />
+                <FormMessage data-testid="recipe-name-error" />
               </FormItem>
             )}
           />
@@ -365,12 +371,19 @@ export default function RecipeForm() {
             control={form.control}
             name="rating"
             render={({ field }) => (
-              <FormItem>
+              <FormItem data-testid="recipe-rating-field">
                 <FormLabel>Ocena (opcjonalnie)</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" max="10" placeholder="1-10" {...field} />
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    placeholder="1-10"
+                    {...field}
+                    data-testid="recipe-rating-input"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage data-testid="recipe-rating-error" />
               </FormItem>
             )}
           />
@@ -379,26 +392,34 @@ export default function RecipeForm() {
             control={form.control}
             name="recipeContent"
             render={({ field }) => (
-              <FormItem>
+              <FormItem data-testid="recipe-content-field">
                 <FormLabel>Treść przepisu</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Wprowadź instrukcje przygotowania przepisu..."
                     className="min-h-[200px]"
                     {...field}
+                    data-testid="recipe-content-input"
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage data-testid="recipe-content-error" />
               </FormItem>
             )}
           />
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={isLoading} className="flex-1">
+          <div className="flex gap-4" data-testid="recipe-form-buttons">
+            <Button type="submit" disabled={isLoading} className="flex-1" data-testid="recipe-save-button">
               {isLoading ? "Zapisywanie..." : "Zapisz"}
             </Button>
 
-            <Button type="button" variant="outline" onClick={onSubmitWithAI} disabled={isLoading} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onSubmitWithAI}
+              disabled={isLoading}
+              className="flex-1"
+              data-testid="recipe-save-with-ai-button"
+            >
               {isLoading ? "Modyfikowanie..." : "Zapisz i modyfikuj z AI"}
             </Button>
           </div>

@@ -32,20 +32,29 @@ export default function ConfirmDeleteModal({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
+      <AlertDialogContent data-testid="confirm-delete-modal">
         <AlertDialogHeader>
-          <AlertDialogTitle>Potwierdź usunięcie przepisu</AlertDialogTitle>
-          <AlertDialogDescription>
-            Czy na pewno chcesz usunąć przepis <span className="font-semibold">&quot;{recipeToDelete?.name}&quot;</span>
+          <AlertDialogTitle data-testid="confirm-delete-modal-title">Potwierdź usunięcie przepisu</AlertDialogTitle>
+          <AlertDialogDescription data-testid="confirm-delete-modal-description">
+            Czy na pewno chcesz usunąć przepis{" "}
+            <span className="font-semibold" data-testid="confirm-delete-recipe-name">
+              &quot;{recipeToDelete?.name}&quot;
+            </span>
             ?
             <br />
             <br />
             Ta akcja jest nieodwracalna i przepis zostanie trwale usunięty z Twojej kolekcji.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Anuluj</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm} className="bg-red-600 hover:bg-red-700 focus:ring-red-600">
+        <AlertDialogFooter data-testid="confirm-delete-modal-footer">
+          <AlertDialogCancel onClick={onClose} data-testid="confirm-delete-cancel-button">
+            Anuluj
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            data-testid="confirm-delete-confirm-button"
+          >
             Usuń przepis
           </AlertDialogAction>
         </AlertDialogFooter>
