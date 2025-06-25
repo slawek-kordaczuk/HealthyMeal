@@ -43,7 +43,8 @@ export default function RecoverPasswordForm({
       setSuccessMessage(null);
 
       // TODO: Replace with actual password recovery logic when backend is implemented
-      console.log("Password recovery attempt:", { email: values.email });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { email } = values;
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));

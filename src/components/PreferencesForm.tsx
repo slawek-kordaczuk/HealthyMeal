@@ -137,7 +137,6 @@ export default function PreferencesForm() {
 
   const onSubmit = async (values: PreferencesFormValues) => {
     try {
-      console.log("[PreferencesForm] Starting onSubmit with values:", values);
       setIsLoading(true);
       setError(null);
       setSuccessMessage(null);
@@ -160,8 +159,6 @@ export default function PreferencesForm() {
         (payload as PreferencesCommandDTO).id = preferencesId;
       }
 
-      console.log("[PreferencesForm] Sending payload:", payload);
-
       const response = await fetch("/api/preferences", {
         method: "POST",
         headers: {
@@ -171,11 +168,8 @@ export default function PreferencesForm() {
         body: JSON.stringify(payload),
       });
 
-      console.log("[PreferencesForm] Response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
-        console.log("[PreferencesForm] Error response:", errorData);
         if (response.status === 401) {
           throw new Error("Unauthorized");
         } else if (response.status === 403) {
@@ -188,7 +182,6 @@ export default function PreferencesForm() {
       }
 
       const savedPreferences: PreferencesDTO = await response.json();
-      console.log("[PreferencesForm] Saved preferences:", savedPreferences);
       setPreferencesId(savedPreferences.id);
       setSuccessMessage("Preferencje zostały zapisane pomyślnie!");
 
@@ -219,8 +212,8 @@ export default function PreferencesForm() {
 
   if (error && error.includes("Sesja wygasła")) {
     return (
-      <Alert className="border-red-200 bg-red-50">
-        <AlertDescription className="text-red-800">
+      <Alert className="border-red-200 bg-red-50" data-testid="preferences-session-expired-alert">
+        <AlertDescription className="text-red-800" data-testid="preferences-session-expired-message">
           Musisz być zalogowany, aby skonfigurować preferencje.
         </AlertDescription>
       </Alert>
@@ -228,33 +221,44 @@ export default function PreferencesForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="preferences-form-container">
       {error && (
-        <Alert className="border-red-200 bg-red-50">
-          <AlertDescription className="text-red-800">{error}</AlertDescription>
+        <Alert className="border-red-200 bg-red-50" data-testid="preferences-error-alert">
+          <AlertDescription className="text-red-800" data-testid="preferences-error-message">
+            {error}
+          </AlertDescription>
         </Alert>
       )}
 
       {successMessage && (
-        <Alert className="border-green-200 bg-green-50">
-          <AlertDescription className="text-green-800">{successMessage}</AlertDescription>
+        <Alert className="border-green-200 bg-green-50" data-testid="preferences-success-alert">
+          <AlertDescription className="text-green-800" data-testid="preferences-success-message">
+            {successMessage}
+          </AlertDescription>
         </Alert>
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="preferences-form">
           {/* Diet Type */}
           <FormField
             control={form.control}
             name="diet_type"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Typ diety</FormLabel>
+              <FormItem data-testid="preferences-diet-type-field">
+                <FormLabel data-testid="preferences-diet-type-label">Typ diety</FormLabel>
                 <FormControl>
-                  <Input placeholder="np. wegetariańska, wegańska, keto" {...field} value={field.value || ""} />
+                  <Input
+                    placeholder="np. wegetariańska, wegańska, keto"
+                    {...field}
+                    value={field.value || ""}
+                    data-testid="preferences-diet-type-input"
+                  />
                 </FormControl>
-                <FormDescription>Określ swój preferowany typ diety (opcjonalne).</FormDescription>
-                <FormMessage />
+                <FormDescription data-testid="preferences-diet-type-description">
+                  Określ swój preferowany typ diety (opcjonalne).
+                </FormDescription>
+                <FormMessage data-testid="preferences-diet-type-error" />
               </FormItem>
             )}
           />
@@ -264,8 +268,10 @@ export default function PreferencesForm() {
             control={form.control}
             name="daily_calorie_requirement"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Dzienne zapotrzebowanie kaloryczne</FormLabel>
+              <FormItem data-testid="preferences-calorie-requirement-field">
+                <FormLabel data-testid="preferences-calorie-requirement-label">
+                  Dzienne zapotrzebowanie kaloryczne
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -276,10 +282,13 @@ export default function PreferencesForm() {
                       const value = e.target.value;
                       field.onChange(value === "" ? null : Number(value));
                     }}
+                    data-testid="preferences-calorie-requirement-input"
                   />
                 </FormControl>
-                <FormDescription>Twoje dzienne zapotrzebowanie kaloryczne w kcal (opcjonalne).</FormDescription>
-                <FormMessage />
+                <FormDescription data-testid="preferences-calorie-requirement-description">
+                  Twoje dzienne zapotrzebowanie kaloryczne w kcal (opcjonalne).
+                </FormDescription>
+                <FormMessage data-testid="preferences-calorie-requirement-error" />
               </FormItem>
             )}
           />
@@ -289,13 +298,20 @@ export default function PreferencesForm() {
             control={form.control}
             name="allergies"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Alergie pokarmowe</FormLabel>
+              <FormItem data-testid="preferences-allergies-field">
+                <FormLabel data-testid="preferences-allergies-label">Alergie pokarmowe</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="np. orzechy, skorupiaki, jaja" {...field} value={field.value || ""} />
+                  <Textarea
+                    placeholder="np. orzechy, skorupiaki, jaja"
+                    {...field}
+                    value={field.value || ""}
+                    data-testid="preferences-allergies-input"
+                  />
                 </FormControl>
-                <FormDescription>Wymień swoje alergie pokarmowe oddzielone przecinkami (opcjonalne).</FormDescription>
-                <FormMessage />
+                <FormDescription data-testid="preferences-allergies-description">
+                  Wymień swoje alergie pokarmowe oddzielone przecinkami (opcjonalne).
+                </FormDescription>
+                <FormMessage data-testid="preferences-allergies-error" />
               </FormItem>
             )}
           />
@@ -305,15 +321,20 @@ export default function PreferencesForm() {
             control={form.control}
             name="food_intolerances"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nietolerancje pokarmowe</FormLabel>
+              <FormItem data-testid="preferences-food-intolerances-field">
+                <FormLabel data-testid="preferences-food-intolerances-label">Nietolerancje pokarmowe</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="np. laktoza, gluten" {...field} value={field.value || ""} />
+                  <Textarea
+                    placeholder="np. laktoza, gluten"
+                    {...field}
+                    value={field.value || ""}
+                    data-testid="preferences-food-intolerances-input"
+                  />
                 </FormControl>
-                <FormDescription>
+                <FormDescription data-testid="preferences-food-intolerances-description">
                   Wymień swoje nietolerancje pokarmowe oddzielone przecinkami (opcjonalne).
                 </FormDescription>
-                <FormMessage />
+                <FormMessage data-testid="preferences-food-intolerances-error" />
               </FormItem>
             )}
           />
@@ -323,19 +344,20 @@ export default function PreferencesForm() {
             control={form.control}
             name="preferred_cuisines"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preferowane kuchnie</FormLabel>
+              <FormItem data-testid="preferences-preferred-cuisines-field">
+                <FormLabel data-testid="preferences-preferred-cuisines-label">Preferowane kuchnie</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="np. włoska, azjatycka, śródziemnomorska"
                     {...field}
                     value={field.value || ""}
+                    data-testid="preferences-preferred-cuisines-input"
                   />
                 </FormControl>
-                <FormDescription>
+                <FormDescription data-testid="preferences-preferred-cuisines-description">
                   Wymień swoje ulubione kuchnie świata oddzielone przecinkami (opcjonalne).
                 </FormDescription>
-                <FormMessage />
+                <FormMessage data-testid="preferences-preferred-cuisines-error" />
               </FormItem>
             )}
           />
@@ -345,36 +367,43 @@ export default function PreferencesForm() {
             control={form.control}
             name="excluded_ingredients"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Wykluczone składniki</FormLabel>
+              <FormItem data-testid="preferences-excluded-ingredients-field">
+                <FormLabel data-testid="preferences-excluded-ingredients-label">Wykluczone składniki</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="np. mięso czerwone, cukier biały" {...field} value={field.value || ""} />
+                  <Textarea
+                    placeholder="np. mięso czerwone, cukier biały"
+                    {...field}
+                    value={field.value || ""}
+                    data-testid="preferences-excluded-ingredients-input"
+                  />
                 </FormControl>
-                <FormDescription>
+                <FormDescription data-testid="preferences-excluded-ingredients-description">
                   Wymień składniki, których chcesz unikać oddzielone przecinkami (opcjonalne).
                 </FormDescription>
-                <FormMessage />
+                <FormMessage data-testid="preferences-excluded-ingredients-error" />
               </FormItem>
             )}
           />
 
           {/* Macro Distribution Section */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-medium">Rozkład makroskładników (%)</h3>
-              <p className="text-sm text-gray-600">
+          <div className="space-y-4" data-testid="preferences-macro-distribution-section">
+            <div data-testid="preferences-macro-distribution-header">
+              <h3 className="text-lg font-medium" data-testid="preferences-macro-distribution-title">
+                Rozkład makroskładników (%)
+              </h3>
+              <p className="text-sm text-gray-600" data-testid="preferences-macro-distribution-description">
                 Określ preferowany rozkład makroskładników. Suma powinna wynosić 100% (opcjonalne).
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="preferences-macro-distribution-grid">
               {/* Protein */}
               <FormField
                 control={form.control}
                 name="macro_distribution_protein"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Białko (%)</FormLabel>
+                  <FormItem data-testid="preferences-protein-field">
+                    <FormLabel data-testid="preferences-protein-label">Białko (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -387,9 +416,10 @@ export default function PreferencesForm() {
                           const value = e.target.value;
                           field.onChange(value === "" ? null : Number(value));
                         }}
+                        data-testid="preferences-protein-input"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage data-testid="preferences-protein-error" />
                   </FormItem>
                 )}
               />
@@ -399,8 +429,8 @@ export default function PreferencesForm() {
                 control={form.control}
                 name="macro_distribution_fats"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tłuszcze (%)</FormLabel>
+                  <FormItem data-testid="preferences-fats-field">
+                    <FormLabel data-testid="preferences-fats-label">Tłuszcze (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -413,9 +443,10 @@ export default function PreferencesForm() {
                           const value = e.target.value;
                           field.onChange(value === "" ? null : Number(value));
                         }}
+                        data-testid="preferences-fats-input"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage data-testid="preferences-fats-error" />
                   </FormItem>
                 )}
               />
@@ -425,8 +456,8 @@ export default function PreferencesForm() {
                 control={form.control}
                 name="macro_distribution_carbohydrates"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Węglowodany (%)</FormLabel>
+                  <FormItem data-testid="preferences-carbohydrates-field">
+                    <FormLabel data-testid="preferences-carbohydrates-label">Węglowodany (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -439,9 +470,10 @@ export default function PreferencesForm() {
                           const value = e.target.value;
                           field.onChange(value === "" ? null : Number(value));
                         }}
+                        data-testid="preferences-carbohydrates-input"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage data-testid="preferences-carbohydrates-error" />
                   </FormItem>
                 )}
               />
@@ -449,7 +481,7 @@ export default function PreferencesForm() {
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" disabled={isLoading} className="w-full">
+          <Button type="submit" disabled={isLoading} className="w-full" data-testid="preferences-submit-button">
             {isLoading ? "Zapisywanie..." : "Zapisz preferencje"}
           </Button>
         </form>
