@@ -68,7 +68,15 @@ export class LoginFormComponent {
     await this.submitButton.click();
   }
 
-  async login(email: string, password: string): Promise<void> {
+  async login(): Promise<void> {
+    // Pobierz dane logowania z zmiennych środowiskowych
+    const email = process.env.E2E_USERNAME;
+    const password = process.env.E2E_PASSWORD;
+
+    if (!email || !password) {
+      throw new Error("Missing E2E_USERNAME or E2E_PASSWORD environment variables");
+    }
+
     // Poczekaj aż formularz będzie w pełni załadowany i React się zainicjalizuje
     await this.page.waitForTimeout(2000);
 

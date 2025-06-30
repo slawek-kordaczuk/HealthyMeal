@@ -9,11 +9,11 @@ test.describe("Authentication Flow - Component-Based POM", () => {
 
     // Zaloguj się
     await loginPage.navigateToLoginPage();
-    await loginPage.login("test@test.pl", "TestPassword123");
+    await loginPage.login();
 
     // Sprawdź czy logowanie się udało
     await navigationPage.waitForAuthenticatedState();
-    expect(await navigationPage.verifyFullAuthenticatedState("test@test.pl")).toBe(true);
+    expect(await navigationPage.verifyFullAuthenticatedState(process.env.E2E_USERNAME)).toBe(true);
 
     // Wyloguj się
     await navigationPage.performLogout();

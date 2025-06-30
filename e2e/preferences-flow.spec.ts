@@ -11,7 +11,7 @@ test.describe("Preferences Flow", () => {
     const preferencesPage = new PreferencesPage(page);
 
     await loginPage.navigateToLoginPage();
-    await loginPage.login("test@test.pl", "TestPassword123");
+    await loginPage.login();
     await navigationPage.waitForAuthenticatedState();
     await navigationPage.navigateToPreferences();
     await preferencesPage.waitForFormToLoad();

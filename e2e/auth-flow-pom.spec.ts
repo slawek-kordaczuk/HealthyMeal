@@ -9,7 +9,7 @@ test.describe("Authentication Flow - Page Object Model", () => {
 
     // Zaloguj się
     await loginPage.navigateToLoginPage();
-    await loginPage.login("test@test.pl", "TestPassword123");
+    await loginPage.login();
 
     // Sprawdź czy logowanie się udało
     await navigationPage.waitForAuthenticatedState();

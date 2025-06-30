@@ -2,6 +2,14 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Authentication Flow", () => {
   test("should login and logout successfully", async ({ page }) => {
+    // Pobierz dane logowania z zmiennych środowiskowych
+    const email = process.env.E2E_USERNAME;
+    const password = process.env.E2E_PASSWORD;
+
+    if (!email || !password) {
+      throw new Error("Missing E2E_USERNAME or E2E_PASSWORD environment variables");
+    }
+
     // Idź na stronę logowania
     await page.goto("/login");
     await expect(page.getByTestId("login-form")).toBeVisible();
@@ -20,21 +28,21 @@ test.describe("Authentication Flow", () => {
     // Wyczyść i wypełnij email
     await emailInput.click();
     await emailInput.clear();
-    await emailInput.fill("test@test.pl");
+    await emailInput.fill(email);
     await emailInput.blur(); // Stracenie focusu może pomóc z walidacją
 
     // Wyczyść i wypełnij hasło
     await passwordInput.click();
     await passwordInput.clear();
-    await passwordInput.fill("TestPassword123");
+    await passwordInput.fill(password);
     await passwordInput.blur();
 
     // Poczekaj chwilę na React state updates
     await page.waitForTimeout(500);
 
     // Upewnij się, że pola są wypełnione
-    await expect(emailInput).toHaveValue("test@test.pl", { timeout: 10000 });
-    await expect(passwordInput).toHaveValue("TestPassword123", { timeout: 10000 });
+    await expect(emailInput).toHaveValue(email, { timeout: 10000 });
+    await expect(passwordInput).toHaveValue(password, { timeout: 10000 });
 
     // Poczekaj na odpowiedź z API po kliknięciu przycisku
     const loginPromise = page.waitForResponse("/api/auth/login");

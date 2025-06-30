@@ -16,7 +16,7 @@ test.describe("User Flow - Login, Preferences, Add Recipe", () => {
     const navigationPage = new NavigationPage(page);
 
     await loginPage.navigateToLoginPage();
-    await loginPage.login("test@test.pl", "TestPassword123");
+    await loginPage.login();
     await navigationPage.waitForAuthenticatedState();
 
     return { loginPage, navigationPage };
