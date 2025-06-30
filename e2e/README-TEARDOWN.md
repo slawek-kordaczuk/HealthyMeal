@@ -13,13 +13,19 @@ Teardown wymaga następujących zmiennych w pliku `.env.test`:
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_supabase_anon_key
 
+# Optional: Service Role Key for teardown (bypasses RLS)
+# SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
 # Test User Configuration
 E2E_USERNAME_ID=d28f8076-e270-41fe-afda-f593d4c93136
 E2E_USERNAME=test@test.pl
 E2E_PASSWORD=TestPassword123
 ```
 
-**Ważne**: `E2E_USERNAME_ID` musi być rzeczywistym UUID użytkownika w systemie auth Supabase.
+**Ważne**: 
+- `E2E_USERNAME_ID` musi być rzeczywistym UUID użytkownika w systemie auth Supabase
+- Jeśli RLS jest włączone, teardown automatycznie loguje się jako testowy użytkownik
+- Opcjonalnie można użyć `SUPABASE_SERVICE_ROLE_KEY` do pominięcia RLS
 
 ## Jak to działa
 
@@ -61,11 +67,18 @@ Po testach zobaczysz:
 
 ```
 🧹 Czyszczenie danych testowego użytkownika po testach e2e...
-🎯 Usuwanie danych dla testowego użytkownika: d28f8076-e270-41fe-afda-f593d4c93136
-✅ Usunięto modyfikacje przepisów testowego użytkownika
-✅ Usunięto przepisy testowego użytkownika  
-✅ Usunięto preferencje testowego użytkownika
-✅ Usunięto niedawne błędy modyfikacji przepisów
+🔑 Używany klucz: Anon (ograniczone przez RLS)
+⚠️ Próba logowania jako testowy użytkownik (anon key wymaga auth)...
+✅ Pomyślnie zalogowano jako testowy użytkownik w teardown
+🎯 Usuwanie danych dla testowego użytkownika: 7c934cc4-adc6-4af7-923b-c314b0746073
+🔍 Sprawdzanie danych testowego użytkownika...
+📊 Znalezione dane:
+    - Przepisy: 3
+    - Preferencje: 1
+    - Modyfikacje: 0
+📝 Przepisy do usunięcia: "Testowy Przepis 123", "Inny Przepis", "Test Recipe"
+✅ Usunięto 3 przepisów testowego użytkownika
+✅ Usunięto 1 preferencji testowego użytkownika
 🎉 Dane testowego użytkownika zostały pomyślnie wyczyszczone po testach e2e
 ```
 
@@ -109,9 +122,18 @@ cat .env.test | grep SUPABASE
 
 ### Błąd podczas usuwania danych
 
-1. Sprawdź czy testowy użytkownik istnieje w auth.users
-2. Sprawdź permissions/RLS policies dla tabel
-3. Sprawdź logi Supabase Dashboard
+1. **RLS (Row Level Security) blokuje dostęp**:
+   - Teardown automatycznie próbuje zalogować się jako testowy użytkownik
+   - Sprawdź czy `E2E_USERNAME` i `E2E_PASSWORD` są poprawne
+   - Alternatywnie dodaj `SUPABASE_SERVICE_ROLE_KEY` do `.env.test`
+
+2. **Testowy użytkownik nie istnieje**:
+   - Sprawdź czy użytkownik istnieje w auth.users w Supabase Dashboard
+   - Sprawdź czy `E2E_USERNAME_ID` jest poprawny
+
+3. **RLS policies są zbyt restrykcyjne**:
+   - Sprawdź RLS policies dla tabel w Supabase Dashboard
+   - Upewnij się, że użytkownik ma dostęp do swoich danych
 
 ### Dezaktywacja teardown
 
