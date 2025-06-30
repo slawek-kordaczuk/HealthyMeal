@@ -4,7 +4,7 @@ import { NavigationPage } from "./page-objects/NavigationPage";
 import { PreferencesPage } from "./page-objects/PreferencesPage";
 import { AddRecipePage } from "./page-objects/AddRecipePage";
 
-test.describe("Complete User Flow - Login, Preferences, Add Recipe", () => {
+test.describe("User Flow - Login, Preferences, Add Recipe", () => {
   // Set viewport size to desktop to ensure navigation links are visible
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });

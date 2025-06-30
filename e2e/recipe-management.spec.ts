@@ -119,10 +119,7 @@ test.describe("Recipe Management", () => {
     await recipesPage.handleDeleteModal(recipeName);
 
     // Assert - Verify recipe was deleted
-    // Wait a bit for the list to refresh after deletion
-    await page.waitForTimeout(1000);
-
-    // The recipe should no longer appear in search results
+    // The recipe should no longer appear in search results (with built-in retry logic)
     await recipesPage.verifyRecipeNotInList(recipeName);
   });
 

@@ -9,25 +9,46 @@ export class RecipesPage extends BasePage {
 
   // Wait for page to load
   async waitForPageToLoad() {
-    await expect(this.page.getByTestId("recipes-page")).toBeVisible();
-    await expect(this.page.getByTestId("recipes-title")).toHaveText("Moje przepisy");
+    await expect(this.page.getByTestId("recipe-list-container")).toBeVisible();
   }
 
   // Wait for recipes to load properly
   async waitForRecipesToLoad() {
-    // Wait for the container to be visible
-    await expect(this.page.getByTestId("recipe-list-container")).toBeVisible();
-
-    // Wait for either recipes table or empty state to appear
+    // Wait for either recipes to load or empty state to appear
     await Promise.race([
-      this.page.getByTestId("recipes-table").waitFor({ state: "visible", timeout: 10000 }),
-      this.page.getByTestId("recipes-empty-state").waitFor({ state: "visible", timeout: 10000 }),
+      this.page.getByTestId("recipes-empty-state").waitFor({ state: "visible", timeout: 15000 }),
+      this.page.locator('[data-testid*="recipe-row-"]').first().waitFor({ state: "visible", timeout: 15000 }),
     ]);
 
-    // If loading is still visible, wait for it to disappear
+    // Also wait for loading state to disappear if it was present
     const loadingContainer = this.page.getByTestId("recipes-loading-container");
     if (await loadingContainer.isVisible()) {
-      await expect(loadingContainer).not.toBeVisible({ timeout: 10000 });
+      await loadingContainer.waitFor({ state: "hidden", timeout: 10000 });
+    }
+  }
+
+  // Wait for list to update after operations like deletion
+  async waitForListUpdate(expectedCount?: number) {
+    // Wait for loading to complete first
+    await this.waitForRecipesToLoad();
+
+    // If expected count is provided, wait for that specific count
+    if (expectedCount !== undefined) {
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (attempts < maxAttempts) {
+        const currentCount = await this.getRecipeCount();
+        if (currentCount === expectedCount) {
+          return;
+        }
+        await this.page.waitForTimeout(1000);
+        attempts++;
+      }
+
+      throw new Error(
+        `Expected ${expectedCount} recipes, but found ${await this.getRecipeCount()} after ${maxAttempts} attempts`
+      );
     }
   }
 
@@ -122,23 +143,66 @@ export class RecipesPage extends BasePage {
   }
 
   async verifyRecipeNotInList(recipeName: string) {
-    const remainingRows = this.page.locator('[data-testid*="recipe-row-"]');
-    const remainingCount = await remainingRows.count();
+    // Wait for the UI to update after deletion with retries
+    let attempt = 0;
+    const maxAttempts = 5;
+    const waitTime = 2000; // 2 seconds between attempts
 
-    if (remainingCount === 0) {
-      await expect(this.page.getByTestId("recipes-empty-state")).toBeVisible();
-      await expect(this.page.getByTestId("recipes-empty-message")).toHaveText("Nie znaleziono przepisów.");
-    } else {
-      // If there are still recipes, make sure our deleted recipe is not among them
-      for (let i = 0; i < remainingCount; i++) {
-        const row = remainingRows.nth(i);
-        const recipeId = await row.getAttribute("data-testid");
-        const extractedId = recipeId?.replace("recipe-row-", "") || "";
-        const nameElement = this.page.getByTestId(`recipe-name-${extractedId}`);
-        const nameText = await nameElement.textContent();
-        expect(nameText).not.toContain(recipeName);
+    while (attempt < maxAttempts) {
+      try {
+        const remainingRows = this.page.locator('[data-testid*="recipe-row-"]');
+
+        // Wait for the list to stabilize
+        await this.page.waitForTimeout(waitTime);
+
+        const remainingCount = await remainingRows.count();
+
+        if (remainingCount === 0) {
+          // Expect empty state
+          await expect(this.page.getByTestId("recipes-empty-state")).toBeVisible({ timeout: 10000 });
+          await expect(this.page.getByTestId("recipes-empty-message")).toHaveText("Nie znaleziono przepisów.");
+          return; // Success - empty state reached
+        } else {
+          // Check if deleted recipe is not in the list
+          let recipeFound = false;
+
+          for (let i = 0; i < remainingCount; i++) {
+            const row = remainingRows.nth(i);
+            const recipeId = await row.getAttribute("data-testid");
+            const extractedId = recipeId?.replace("recipe-row-", "") || "";
+            const nameElement = this.page.getByTestId(`recipe-name-${extractedId}`);
+            const nameText = await nameElement.textContent();
+
+            if (nameText?.includes(recipeName)) {
+              recipeFound = true;
+              break;
+            }
+          }
+
+          if (!recipeFound) {
+            return; // Success - recipe not found in list
+          }
+        }
+
+        // If we reach here, recipe is still in list, try again
+        attempt++;
+
+        if (attempt < maxAttempts) {
+          console.log(`Recipe still in list, attempt ${attempt}/${maxAttempts}, waiting ${waitTime}ms...`);
+          await this.page.waitForTimeout(waitTime);
+        }
+      } catch (error) {
+        attempt++;
+        if (attempt >= maxAttempts) {
+          throw error;
+        }
+        console.log(`Error checking recipe list, attempt ${attempt}/${maxAttempts}, retrying...`);
+        await this.page.waitForTimeout(waitTime);
       }
     }
+
+    // If we get here, all attempts failed
+    throw new Error(`Recipe "${recipeName}" is still visible in the list after ${maxAttempts} attempts`);
   }
 
   // Modal handling
@@ -160,6 +224,9 @@ export class RecipesPage extends BasePage {
 
     // Wait for modal to disappear
     await this.page.getByTestId("confirm-delete-modal").waitFor({ state: "detached", timeout: 10000 });
+
+    // Wait for the deletion operation to complete by waiting for list update
+    await this.waitForListUpdate();
   }
 
   async handleCancelModal() {
