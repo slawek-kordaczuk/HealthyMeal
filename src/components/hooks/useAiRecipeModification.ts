@@ -1,17 +1,34 @@
 import { useState, useCallback } from "react";
-import type { AiModificationStateViewModel } from "../../types/viewModels";
-import type { RecipeModificationCommand, RecipeModificationResponseDTO } from "../../types/types";
+import {
+  modifyRecipeWithAI,
+  PreferencesRequiredError,
+  AuthenticationError,
+  RecipeApiError,
+} from "../../lib/services/recipeApiService";
+import { validateRecipeContentForAI } from "../../lib/services/recipeContentService";
+
+interface AiModificationState {
+  originalRecipeText: string;
+  suggestedRecipeText: string | null;
+  isLoadingAiSuggestion: boolean;
+  aiError: string | null;
+  showMissingPreferencesWarning: boolean;
+}
 
 interface UseAiRecipeModificationReturn {
-  aiState: AiModificationStateViewModel;
+  aiState: AiModificationState;
   generateSuggestion: (recipeText: string) => Promise<void>;
   approveSuggestion: () => string | null;
   rejectSuggestion: () => void;
   resetAiState: (originalText: string) => void;
 }
 
+/**
+ * Hook for managing AI recipe modification state and operations.
+ * Uses the new API service for cleaner separation of concerns.
+ */
 export function useAiRecipeModification(): UseAiRecipeModificationReturn {
-  const [aiState, setAiState] = useState<AiModificationStateViewModel>({
+  const [aiState, setAiState] = useState<AiModificationState>({
     originalRecipeText: "",
     suggestedRecipeText: null,
     isLoadingAiSuggestion: false,
@@ -20,21 +37,12 @@ export function useAiRecipeModification(): UseAiRecipeModificationReturn {
   });
 
   const generateSuggestion = useCallback(async (recipeText: string) => {
-    // Validate recipe text length
-    if (recipeText.length < 100) {
+    // Validate recipe text before making API call
+    const validation = validateRecipeContentForAI(recipeText);
+    if (!validation.isValid) {
       setAiState((prev) => ({
         ...prev,
-        aiError: "Tekst przepisu musi mieć co najmniej 100 znaków.",
-        suggestedRecipeText: null,
-        showMissingPreferencesWarning: false,
-      }));
-      return;
-    }
-
-    if (recipeText.length > 10000) {
-      setAiState((prev) => ({
-        ...prev,
-        aiError: "Tekst przepisu nie może być dłuższy niż 10000 znaków.",
+        aiError: validation.error || "Nieprawidłowy tekst przepisu",
         suggestedRecipeText: null,
         showMissingPreferencesWarning: false,
       }));
@@ -50,55 +58,48 @@ export function useAiRecipeModification(): UseAiRecipeModificationReturn {
     }));
 
     try {
-      const command: RecipeModificationCommand = {
-        recipe_text: recipeText,
-      };
-
-      const response = await fetch("/api/recipes/modify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(command),
-      });
-
-      if (!response.ok) {
-        if (response.status === 422) {
-          // Missing preferences error
-          setAiState((prev) => ({
-            ...prev,
-            isLoadingAiSuggestion: false,
-            aiError: null,
-            showMissingPreferencesWarning: true,
-          }));
-          return;
-        }
-
-        if (response.status === 401) {
-          throw new Error("Sesja wygasła, zaloguj się ponownie.");
-        }
-
-        throw new Error("Modyfikacja AI nie powiodła się.");
-      }
-
-      const data: RecipeModificationResponseDTO = await response.json();
+      const modifiedRecipe = await modifyRecipeWithAI(recipeText);
 
       setAiState((prev) => ({
         ...prev,
         isLoadingAiSuggestion: false,
-        suggestedRecipeText: data.modified_recipe,
+        suggestedRecipeText: modifiedRecipe,
         aiError: null,
         showMissingPreferencesWarning: false,
       }));
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.";
-      setAiState((prev) => ({
-        ...prev,
-        isLoadingAiSuggestion: false,
-        aiError: errorMessage,
-        suggestedRecipeText: null,
-        showMissingPreferencesWarning: false,
-      }));
+    } catch (error) {
+      if (error instanceof PreferencesRequiredError) {
+        setAiState((prev) => ({
+          ...prev,
+          isLoadingAiSuggestion: false,
+          aiError: null,
+          showMissingPreferencesWarning: true,
+        }));
+      } else if (error instanceof AuthenticationError) {
+        setAiState((prev) => ({
+          ...prev,
+          isLoadingAiSuggestion: false,
+          aiError: error.message,
+          suggestedRecipeText: null,
+          showMissingPreferencesWarning: false,
+        }));
+      } else if (error instanceof RecipeApiError) {
+        setAiState((prev) => ({
+          ...prev,
+          isLoadingAiSuggestion: false,
+          aiError: error.message,
+          suggestedRecipeText: null,
+          showMissingPreferencesWarning: false,
+        }));
+      } else {
+        setAiState((prev) => ({
+          ...prev,
+          isLoadingAiSuggestion: false,
+          aiError: "Wystąpił nieoczekiwany błąd podczas modyfikacji AI",
+          suggestedRecipeText: null,
+          showMissingPreferencesWarning: false,
+        }));
+      }
     }
   }, []);
 
