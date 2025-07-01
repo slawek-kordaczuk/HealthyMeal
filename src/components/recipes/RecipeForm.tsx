@@ -45,17 +45,8 @@ export default function RecipeForm() {
   // Custom hooks
   const auth = useAuth();
   const { arePreferencesSet, isLoading: preferencesLoading } = usePreferencesStatus();
-  const {
-    isLoading,
-    error,
-    successMessage,
-    aiState,
-    createRecipe,
-    modifyWithAI,
-    rejectAIChanges,
-    resetState,
-    clearMessages,
-  } = useRecipeOperations();
+  const { isLoading, error, successMessage, aiState, createRecipe, modifyWithAI, rejectAIChanges, clearMessages } =
+    useRecipeOperations();
 
   const form = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
@@ -66,9 +57,8 @@ export default function RecipeForm() {
     },
   });
 
-  const resetForm = () => {
+  const resetFormOnly = () => {
     form.reset();
-    resetState();
   };
 
   const handleSaveRecipe = async (values: RecipeFormValues, source: "manual" | "AI" = "manual") => {
@@ -80,7 +70,7 @@ export default function RecipeForm() {
     const result = await createRecipe(values, source, auth.userId);
 
     if (result) {
-      resetForm();
+      resetFormOnly(); // Reset form but keep success message visible
     }
   };
 
@@ -107,7 +97,7 @@ export default function RecipeForm() {
     const result = await createRecipe(values, "AI", auth.userId);
 
     if (result) {
-      resetForm();
+      resetFormOnly(); // Reset form but keep success message visible
     }
   };
 

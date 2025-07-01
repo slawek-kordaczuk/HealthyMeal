@@ -135,25 +135,33 @@ export class AddRecipePage extends BasePage {
   }
 
   async submitAndWaitForResult(): Promise<"success" | "error"> {
+    // Monitor network requests
+    const responsePromise = this.page.waitForResponse(
+      (response) => response.url().includes("/api/recipes/create") && response.request().method() === "POST"
+    );
+
     await this.submitRecipe();
 
-    // Wait for either success or error alert
     try {
-      await this.page.waitForFunction(
-        () => {
-          const successAlert = document.querySelector('[data-testid="recipe-form-success-alert"]');
-          const errorAlert = document.querySelector('[data-testid="recipe-form-error-alert"]');
-          return successAlert || errorAlert;
-        },
-        { timeout: 10000 }
-      );
+      const response = await responsePromise;
 
-      if (await this.isSuccessAlertVisible()) {
+      if (response.ok()) {
+        // Wait for success alert
+        await this.page.waitForSelector('[data-testid="recipe-form-success-alert"]', { timeout: 5000 });
         return "success";
       } else {
+        // Wait for error alert
+        await this.page.waitForSelector('[data-testid="recipe-form-error-alert"]', { timeout: 5000 });
         return "error";
       }
     } catch {
+      // Check if any alert is visible at all
+      const successAlert = await this.page.locator('[data-testid="recipe-form-success-alert"]').isVisible();
+      const errorAlert = await this.page.locator('[data-testid="recipe-form-error-alert"]').isVisible();
+
+      if (successAlert) return "success";
+      if (errorAlert) return "error";
+
       return "error";
     }
   }
