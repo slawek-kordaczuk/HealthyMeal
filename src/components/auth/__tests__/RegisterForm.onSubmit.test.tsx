@@ -8,7 +8,17 @@ const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock window.location
-const mockLocation = {
+interface MockLocation {
+  href: string;
+  search: string;
+  pathname: string;
+  assign: ReturnType<typeof vi.fn>;
+  replace: ReturnType<typeof vi.fn>;
+  reload: ReturnType<typeof vi.fn>;
+  [key: string]: unknown;
+}
+
+const mockLocation: MockLocation = {
   href: "http://localhost:3000/register",
   search: "",
   pathname: "/register",
@@ -17,9 +27,24 @@ const mockLocation = {
   reload: vi.fn(),
 };
 
+// Create a proper location mock that captures href setter
 Object.defineProperty(window, "location", {
-  value: mockLocation,
+  value: new Proxy(mockLocation, {
+    set(target, prop, value) {
+      if (typeof prop === "string") {
+        (target as MockLocation)[prop] = value;
+      }
+      return true;
+    },
+    get(target, prop) {
+      if (typeof prop === "string") {
+        return (target as MockLocation)[prop];
+      }
+      return undefined;
+    },
+  }),
   writable: true,
+  configurable: true,
 });
 
 describe("RegisterForm onSubmit Logic", () => {
