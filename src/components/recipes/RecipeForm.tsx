@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { usePreferences } from "../hooks/usePreferences";
+import { usePreferencesStatus } from "../preferences/hooks/usePreferencesStatus";
 import type {
   CreateRecipeCommand,
   RecipeDTO,
@@ -68,7 +68,7 @@ export default function RecipeForm() {
   });
 
   // Get user preferences - only if authenticated
-  const { arePreferencesSet, isLoading: preferencesLoading } = usePreferences();
+  const { arePreferencesSet, isLoading: preferencesLoading } = usePreferencesStatus();
 
   const form = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
