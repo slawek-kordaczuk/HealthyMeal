@@ -32,19 +32,6 @@ export const useRecipeOperations = () => {
     aiModifiedContent: null,
   });
 
-  const resetState = () => {
-    setOperationState({
-      isLoading: false,
-      error: null,
-      successMessage: null,
-    });
-    setAiState({
-      isAIFlowActive: false,
-      originalContentForAI: null,
-      aiModifiedContent: null,
-    });
-  };
-
   const createRecipe = async (
     values: RecipeFormValues,
     source: "manual" | "AI" = "manual",
@@ -113,16 +100,12 @@ export const useRecipeOperations = () => {
 
       return createdRecipe;
     } catch (err) {
-      console.error("Error creating recipe:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Wystąpił błąd podczas zapisywania przepisu. Spróbuj ponownie.";
-
+      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.";
       setOperationState((prev) => ({
         ...prev,
         isLoading: false,
         error: errorMessage,
       }));
-
       return null;
     }
   };
@@ -140,7 +123,6 @@ export const useRecipeOperations = () => {
       return { success: false, needsPreferences: false };
     }
 
-    // Check if preferences are set
     if (!arePreferencesSet) {
       return { success: false, needsPreferences: true };
     }
@@ -152,13 +134,6 @@ export const useRecipeOperations = () => {
         error: null,
         successMessage: null,
       }));
-
-      // Set AI flow state
-      setAiState({
-        isAIFlowActive: true,
-        originalContentForAI: values.recipeContent,
-        aiModifiedContent: null,
-      });
 
       const payload: RecipeModificationCommand = {
         recipe_text: values.recipeContent,
@@ -174,28 +149,22 @@ export const useRecipeOperations = () => {
       });
 
       if (!response.ok) {
-        // Try to get the error message from the response
-        let errorMessage = "Failed to modify recipe with AI";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch {
-          // If response is not JSON, use status-based message
-          if (response.status === 422) {
-            errorMessage = "User preferences not found. Please set your dietary preferences first.";
-          } else if (response.status === 401) {
-            errorMessage = "Unauthorized. Please log in again.";
-          }
+        if (response.status === 401) {
+          throw new Error("Sesja wygasła. Zaloguj się ponownie.");
         }
-        throw new Error(errorMessage);
+        if (response.status === 400) {
+          throw new Error("Nieprawidłowe dane wejściowe. Sprawdź zawartość przepisu.");
+        }
+        throw new Error("Nie udało się zmodyfikować przepisu.");
       }
 
-      const modificationResult: RecipeModificationResponseDTO = await response.json();
+      const result: RecipeModificationResponseDTO = await response.json();
 
-      setAiState((prev) => ({
-        ...prev,
-        aiModifiedContent: modificationResult.modified_recipe,
-      }));
+      setAiState({
+        isAIFlowActive: true,
+        originalContentForAI: values.recipeContent,
+        aiModifiedContent: result.modified_recipe,
+      });
 
       setOperationState((prev) => ({
         ...prev,
@@ -204,34 +173,13 @@ export const useRecipeOperations = () => {
 
       return { success: true, needsPreferences: false };
     } catch (err) {
-      console.error("Error modifying recipe with AI:", err);
-
-      // Check if the error is related to missing preferences
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      const isPreferencesError =
-        errorMessage.toLowerCase().includes("preferences") || errorMessage.toLowerCase().includes("not found");
-
-      if (isPreferencesError) {
-        setOperationState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: "Brak preferencji żywieniowych. Uzupełnij swoje preferencje, aby móc korzystać z modyfikacji AI.",
-        }));
-        return { success: false, needsPreferences: true };
-      } else {
-        // For other errors, reset AI flow
-        setOperationState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: "Modyfikacja AI nie powiodła się. Spróbuj ponownie lub zapisz przepis manualnie.",
-        }));
-        setAiState({
-          isAIFlowActive: false,
-          originalContentForAI: null,
-          aiModifiedContent: null,
-        });
-        return { success: false, needsPreferences: false };
-      }
+      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.";
+      setOperationState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+      return { success: false, needsPreferences: false };
     }
   };
 
@@ -252,15 +200,13 @@ export const useRecipeOperations = () => {
   };
 
   return {
-    // State
-    ...operationState,
+    isLoading: operationState.isLoading,
+    error: operationState.error,
+    successMessage: operationState.successMessage,
     aiState,
-
-    // Actions
     createRecipe,
     modifyWithAI,
     rejectAIChanges,
-    resetState,
     clearMessages,
   };
 };

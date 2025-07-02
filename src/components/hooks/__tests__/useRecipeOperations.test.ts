@@ -191,32 +191,12 @@ describe("useRecipeOperations", () => {
       });
 
       expect(result.current.isLoading).toBe(false);
-      expect(result.current.error).toBe(
-        "Modyfikacja AI nie powiodła się. Spróbuj ponownie lub zapisz przepis manualnie."
-      );
+      expect(result.current.error).toBe("Nie udało się zmodyfikować przepisu.");
       expect(result.current.aiState.isAIFlowActive).toBe(false);
     });
   });
 
   describe("State Management", () => {
-    it("should reset state correctly", () => {
-      const { result } = renderHook(() => useRecipeOperations());
-
-      // Set some state first
-      act(() => {
-        result.current.resetState();
-      });
-
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.error).toBe(null);
-      expect(result.current.successMessage).toBe(null);
-      expect(result.current.aiState).toEqual({
-        isAIFlowActive: false,
-        originalContentForAI: null,
-        aiModifiedContent: null,
-      });
-    });
-
     it("should clear messages correctly", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
@@ -241,22 +221,48 @@ describe("useRecipeOperations", () => {
       expect(result.current.successMessage).toBe(null);
     });
 
-    it("should reject AI changes correctly", () => {
-      const { result } = renderHook(() => useRecipeOperations());
+    it("should reject AI changes correctly", async () => {
+      // First, set up AI state by calling modifyWithAI
+      const mockAIResponse = {
+        modified_recipe: "AI modified recipe instructions",
+      };
 
-      // First simulate an AI flow
-      act(() => {
-        // Manually set AI state for testing
-        result.current.aiState.isAIFlowActive = true;
-        result.current.aiState.originalContentForAI = "original content";
-        result.current.aiState.aiModifiedContent = "modified content";
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockAIResponse),
       });
 
-      // Reject changes
+      const { result } = renderHook(() => useRecipeOperations());
+
+      // First, create AI state
+      await act(async () => {
+        await result.current.modifyWithAI(mockRecipeFormValues, "user123", true);
+      });
+
+      // Verify AI state is active
+      expect(result.current.aiState.isAIFlowActive).toBe(true);
+      expect(result.current.aiState.originalContentForAI).toBe(mockRecipeFormValues.recipeContent);
+      expect(result.current.aiState.aiModifiedContent).toBe("AI modified recipe instructions");
+
+      // Now reject changes
       act(() => {
         result.current.rejectAIChanges();
       });
 
+      expect(result.current.aiState).toEqual({
+        isAIFlowActive: false,
+        originalContentForAI: null,
+        aiModifiedContent: null,
+      });
+    });
+
+    it("should initialize with default state values", () => {
+      const { result } = renderHook(() => useRecipeOperations());
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error).toBe(null);
+      expect(result.current.successMessage).toBe(null);
       expect(result.current.aiState).toEqual({
         isAIFlowActive: false,
         originalContentForAI: null,

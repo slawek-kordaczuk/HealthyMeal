@@ -54,7 +54,10 @@ export class RecipesPage extends BasePage {
 
   // Search functionality
   async searchForRecipe(recipeName: string) {
-    await this.page.getByTestId("recipe-search-input").fill(recipeName);
+    // Wait for the search input to be visible and ready
+    const searchInput = this.page.getByTestId("recipe-search-input");
+    await searchInput.waitFor({ state: "visible", timeout: 15000 });
+    await searchInput.fill(recipeName);
     // Wait for search to complete and results to update
     await this.page.waitForTimeout(2000);
   }
