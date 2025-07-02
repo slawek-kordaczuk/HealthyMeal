@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -6,6 +6,7 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/hooks/useAuth";
 import type { NavigationLinkItem } from "@/types/types";
 
 /**
@@ -14,61 +15,10 @@ import type { NavigationLinkItem } from "@/types/types";
  * Displays different menu items based on authentication status.
  */
 export function NavigationMenuContainer() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  // Check authentication status using actual session from server
-  const checkAuthStatus = async () => {
-    try {
-      // Try accessing the user profile API to check if user is authenticated and get email
-      const response = await fetch("/api/user/profile", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (response.status === 200) {
-        // User is authenticated, get profile data
-        const profileData = await response.json();
-        setIsAuthenticated(true);
-        setUserEmail(profileData.email);
-      } else {
-        // User is not authenticated
-        setIsAuthenticated(false);
-        setUserEmail(null);
-      }
-    } catch (error) {
-      console.warn("Auth check failed:", error);
-      setIsAuthenticated(false);
-      setUserEmail(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Initial auth check
-    checkAuthStatus();
-
-    // Listen for window focus to refresh auth status
-    // This helps when user logs in via different tab/window
-    const handleFocus = () => {
-      checkAuthStatus();
-    };
-
-    // Listen for custom login/logout events
-    const handleAuthChange = () => {
-      checkAuthStatus();
-    };
-
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("authChange", handleAuthChange);
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("authChange", handleAuthChange);
-    };
-  }, []);
+  const { isAuthenticated, isLoading, userEmail, logout, error } = useAuth({
+    refreshOnFocus: true,
+    listenToAuthEvents: true,
+  });
 
   // Define navigation links for authenticated users
   const authenticatedNavLinks: NavigationLinkItem[] = [
@@ -86,27 +36,7 @@ export function NavigationMenuContainer() {
   const currentNavLinks = isAuthenticated ? authenticatedNavLinks : nonAuthenticatedNavLinks;
 
   const handleLogout = async () => {
-    try {
-      // Call logout API endpoint
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        console.error("Logout failed:", await response.text());
-      }
-
-      // Emit custom event to notify about auth change
-      window.dispatchEvent(new CustomEvent("authChange"));
-
-      // Redirect to home page
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Still redirect even if API call failed
-      window.location.href = "/";
-    }
+    await logout();
   };
 
   // Show minimal layout during very brief loading to prevent FOUC
@@ -150,6 +80,13 @@ export function NavigationMenuContainer() {
 
   return (
     <div className="flex h-16 items-center justify-between w-full" data-testid="navigation-container">
+      {/* Display error message if any */}
+      {error && (
+        <div className="absolute top-16 left-0 right-0 bg-destructive/10 border border-destructive/20 text-destructive text-sm p-2 text-center z-50">
+          {error}
+        </div>
+      )}
+
       {/* Conditional layout based on authentication status */}
       {!isAuthenticated ? (
         // Non-authenticated layout: HealthyMeal centered, auth buttons on right
