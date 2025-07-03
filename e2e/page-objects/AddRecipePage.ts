@@ -44,6 +44,64 @@ export class AddRecipePage extends BasePage {
     await this.page.getByTestId("recipe-save-with-ai-button").click();
   }
 
+  // AI Modification Flow
+  async isAIPreviewSectionVisible(): Promise<boolean> {
+    try {
+      await expect(this.page.getByTestId("ai-preview-section")).toBeVisible({ timeout: 10000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async waitForAIPreviewSection() {
+    await expect(this.page.getByTestId("ai-preview-section")).toBeVisible({ timeout: 15000 });
+  }
+
+  async getOriginalContent(): Promise<string> {
+    const content = await this.page.getByTestId("ai-preview-original-content").textContent();
+    return content || "";
+  }
+
+  async getModifiedContent(): Promise<string> {
+    const content = await this.page.getByTestId("ai-preview-modified-content").textContent();
+    return content || "";
+  }
+
+  async approveAIChanges() {
+    await this.page.getByTestId("ai-preview-approve-button").click();
+  }
+
+  async rejectAIChanges() {
+    await this.page.getByTestId("ai-preview-reject-button").click();
+  }
+
+  async isConfirmAIModificationModalVisible(): Promise<boolean> {
+    try {
+      await expect(this.page.getByTestId("confirm-ai-modification-modal-content")).toBeVisible({ timeout: 5000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async waitForConfirmAIModificationModal() {
+    await expect(this.page.getByTestId("confirm-ai-modification-modal-content")).toBeVisible({ timeout: 10000 });
+  }
+
+  async closeConfirmAIModificationModal() {
+    await this.page.getByTestId("confirm-ai-modification-modal-cancel-button").click();
+  }
+
+  async goToPreferencesFromModal() {
+    await this.page.getByTestId("confirm-ai-modification-modal-go-to-preferences-button").click();
+  }
+
+  async getConfirmAIModificationModalTitle(): Promise<string> {
+    const title = await this.page.getByTestId("confirm-ai-modification-modal-title").textContent();
+    return title || "";
+  }
+
   // Form validation
   async getNameError(): Promise<string> {
     const errorElement = this.page.getByTestId("recipe-name-error");
@@ -162,6 +220,69 @@ export class AddRecipePage extends BasePage {
       if (successAlert) return "success";
       if (errorAlert) return "error";
 
+      return "error";
+    }
+  }
+
+  /**
+   * Complete AI modification flow: submit with AI, wait for preview, approve changes
+   * @param recipeName - Name of the recipe
+   * @param rating - Optional rating (1-10)
+   * @param content - Optional custom content
+   * @returns Promise<"success" | "error" | "needs-preferences">
+   */
+  async submitWithAIAndApprove(
+    recipeName: string,
+    rating?: number,
+    content?: string
+  ): Promise<"success" | "error" | "needs-preferences"> {
+    // Fill form first
+    await this.fillFormWithValidData(recipeName, rating, content);
+
+    // Submit with AI
+    await this.submitRecipeWithAI();
+
+    try {
+      // Wait for either AI preview section or preferences modal
+      await Promise.race([
+        this.waitForAIPreviewSection().catch(() => Promise.resolve()),
+        this.waitForConfirmAIModificationModal().catch(() => Promise.resolve()),
+        this.page
+          .waitForSelector('[data-testid="recipe-form-error-alert"]', { timeout: 20000 })
+          .catch(() => Promise.resolve()),
+      ]);
+
+      // Check if preferences modal appeared
+      if (await this.isConfirmAIModificationModalVisible()) {
+        return "needs-preferences";
+      }
+
+      // Check if error alert appeared
+      if (await this.isErrorAlertVisible()) {
+        return "error";
+      }
+
+      // If AI preview section appeared, proceed with approval
+      if (await this.isAIPreviewSectionVisible()) {
+        // Approve AI changes
+        await this.approveAIChanges();
+
+        // Wait for success or error after approval
+        await Promise.race([
+          this.page.waitForSelector('[data-testid="recipe-form-success-alert"]', { timeout: 10000 }),
+          this.page.waitForSelector('[data-testid="recipe-form-error-alert"]', { timeout: 10000 }),
+        ]);
+
+        if (await this.isSuccessAlertVisible()) {
+          return "success";
+        } else {
+          return "error";
+        }
+      }
+
+      return "error";
+    } catch (error) {
+      console.error("Error in submitWithAIAndApprove:", error);
       return "error";
     }
   }
