@@ -53,21 +53,26 @@ export default function ManualEditForm({ recipe, onSubmit, onCancel, isSubmittin
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4" data-testid="manual-edit-form">
       {/* Recipe Name */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-testid="manual-edit-name-section">
         <Label htmlFor="recipe-name">Nazwa przepisu</Label>
         <Input
           id="recipe-name"
           {...register("name")}
           placeholder="Wprowadź nazwę przepisu"
           className={errors.name ? "border-red-500" : ""}
+          data-testid="manual-edit-name-input"
         />
-        {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
+        {errors.name && (
+          <p className="text-sm text-red-600" data-testid="manual-edit-name-error">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       {/* Recipe Rating */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-testid="manual-edit-rating-section">
         <Label htmlFor="recipe-rating">Ocena: {rating || "Brak oceny"}</Label>
         <div className="px-3">
           <Slider
@@ -78,6 +83,7 @@ export default function ManualEditForm({ recipe, onSubmit, onCancel, isSubmittin
             value={[Number(rating) || 5]}
             onValueChange={handleRatingChange}
             className="w-full"
+            data-testid="manual-edit-rating-slider"
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>1</span>
@@ -85,11 +91,15 @@ export default function ManualEditForm({ recipe, onSubmit, onCancel, isSubmittin
             <span>10</span>
           </div>
         </div>
-        {errors.rating && <p className="text-sm text-red-600">{errors.rating.message}</p>}
+        {errors.rating && (
+          <p className="text-sm text-red-600" data-testid="manual-edit-rating-error">
+            {errors.rating.message}
+          </p>
+        )}
       </div>
 
       {/* Recipe Content */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-testid="manual-edit-content-section">
         <Label htmlFor="recipe-content">Zawartość przepisu</Label>
         <Textarea
           id="recipe-content"
@@ -97,21 +107,34 @@ export default function ManualEditForm({ recipe, onSubmit, onCancel, isSubmittin
           placeholder="Wprowadź treść przepisu..."
           rows={12}
           className={errors.recipeContent ? "border-red-500" : ""}
+          data-testid="manual-edit-content-input"
         />
         <div className="flex justify-between text-xs text-gray-500">
-          <span>{errors.recipeContent && <span className="text-red-600">{errors.recipeContent.message}</span>}</span>
-          <span>{recipeContent.length}/10000 znaków</span>
+          <span>
+            {errors.recipeContent && (
+              <span className="text-red-600" data-testid="manual-edit-content-error">
+                {errors.recipeContent.message}
+              </span>
+            )}
+          </span>
+          <span data-testid="manual-edit-content-counter">{recipeContent.length}/10000 znaków</span>
         </div>
       </div>
 
       {/* Form Actions */}
-      <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+      <div className="flex justify-end space-x-3 pt-4" data-testid="manual-edit-form-actions">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          data-testid="manual-edit-cancel-button"
+        >
           Anuluj
         </Button>
-        <Button type="submit" disabled={!isValid || isSubmitting}>
+        <Button type="submit" disabled={!isValid || isSubmitting} data-testid="manual-edit-save-button">
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Zapisz zmiany
+          {isSubmitting ? "Zapisywanie..." : "Zapisz zmiany"}
         </Button>
       </div>
     </form>

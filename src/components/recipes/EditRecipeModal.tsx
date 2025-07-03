@@ -59,19 +59,27 @@ export default function EditRecipeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edytuj przepis: {recipeToEdit.name}</DialogTitle>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="edit-recipe-modal">
+        <DialogHeader data-testid="edit-recipe-modal-header">
+          <DialogTitle data-testid="edit-recipe-modal-title">Edytuj przepis: {recipeToEdit.name}</DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as "manual" | "ai")}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Edycja ręczna</TabsTrigger>
-            <TabsTrigger value="ai">Modyfikacja AI</TabsTrigger>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => handleTabChange(value as "manual" | "ai")}
+          data-testid="edit-recipe-modal-tabs"
+        >
+          <TabsList className="grid w-full grid-cols-2" data-testid="edit-recipe-modal-tabs-list">
+            <TabsTrigger value="manual" data-testid="edit-recipe-modal-manual-tab">
+              Edycja ręczna
+            </TabsTrigger>
+            <TabsTrigger value="ai" data-testid="edit-recipe-modal-ai-tab">
+              Modyfikacja AI
+            </TabsTrigger>
           </TabsList>
 
           {/* Manual Edit Tab */}
-          <TabsContent value="manual">
+          <TabsContent value="manual" data-testid="edit-recipe-modal-manual-content">
             <ManualEditForm
               recipe={recipeToEdit}
               onSubmit={handleFormSubmit}
@@ -81,7 +89,7 @@ export default function EditRecipeModal({
           </TabsContent>
 
           {/* AI Modification Tab */}
-          <TabsContent value="ai">
+          <TabsContent value="ai" data-testid="edit-recipe-modal-ai-content">
             <AIModificationPanel
               recipe={recipeToEdit}
               onSubmit={handleFormSubmit}
