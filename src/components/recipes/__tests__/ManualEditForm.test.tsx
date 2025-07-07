@@ -62,7 +62,7 @@ describe("ManualEditForm", () => {
 
     render(<ManualEditForm recipe={mockRecipe} onSubmit={mockOnSubmit} onCancel={mockOnCancel} isSubmitting={false} />);
 
-    const submitButton = screen.getByRole("button", { name: /zapisz zmiany/i });
+    const submitButton = screen.getByTestId("manual-edit-save-button");
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -79,7 +79,7 @@ describe("ManualEditForm", () => {
 
     render(<ManualEditForm recipe={mockRecipe} onSubmit={mockOnSubmit} onCancel={mockOnCancel} isSubmitting={false} />);
 
-    const cancelButton = screen.getByRole("button", { name: /anuluj/i });
+    const cancelButton = screen.getByTestId("manual-edit-cancel-button");
     await user.click(cancelButton);
 
     expect(mockOnCancel).toHaveBeenCalled();
@@ -88,7 +88,7 @@ describe("ManualEditForm", () => {
   it("should disable buttons when submitting", () => {
     render(<ManualEditForm recipe={mockRecipe} onSubmit={mockOnSubmit} onCancel={mockOnCancel} isSubmitting={true} />);
 
-    expect(screen.getByRole("button", { name: /zapisz zmiany/i })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /anuluj/i })).toBeDisabled();
+    expect(screen.getByTestId("manual-edit-save-button")).toBeDisabled();
+    expect(screen.getByTestId("manual-edit-cancel-button")).toBeDisabled();
   });
 });
