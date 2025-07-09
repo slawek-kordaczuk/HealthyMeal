@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import type { RecipeFormValues } from "../recipes/RecipeForm";
+import type { RecipeFormValues } from "../../types/types";
 import type { RecipeModificationCommand, RecipeModificationResponseDTO } from "../../types/types";
 
 // Mock fetch globally

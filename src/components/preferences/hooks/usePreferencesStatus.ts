@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import type { PreferencesDTO } from "../../types/types";
+import type { PreferencesDTO } from "../../../types/types";
 
-interface UsePreferencesReturn {
+interface UsePreferencesStatusReturn {
   preferences: PreferencesDTO | null;
   arePreferencesSet: boolean;
   isLoading: boolean;
@@ -9,7 +9,7 @@ interface UsePreferencesReturn {
   refetch: () => Promise<void>;
 }
 
-export function usePreferences(): UsePreferencesReturn {
+export function usePreferencesStatus(): UsePreferencesStatusReturn {
   const [preferences, setPreferences] = useState<PreferencesDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

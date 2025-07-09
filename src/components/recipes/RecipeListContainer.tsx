@@ -1,126 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRecipes } from "../hooks/useRecipes";
-import RecipeSearchInput from "./RecipeSearchInput.tsx";
-import RecipeTable from "./RecipeTable.tsx";
-import RecipePagination from "./RecipePagination.tsx";
-import EditRecipeModal from "./EditRecipeModal.tsx";
-import ConfirmDeleteModal from "./ConfirmDeleteModal.tsx";
+import { usePreferencesStatus } from "../hooks/usePreferencesStatus";
+import { useModalManagement } from "../hooks/useModalManagement";
+import { useRecipeListOperations } from "../hooks/useRecipeListOperations";
+import EnhancedRecipeSearchInput from "./EnhancedRecipeSearchInput";
+import RecipeTable from "./RecipeTable";
+import RecipePagination from "./RecipePagination";
+import EditRecipeModal from "./EditRecipeModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import type { RecipeDTO, UpdateRecipeCommand } from "../../types/types";
-import { toast } from "sonner";
 
 export default function RecipeListContainer() {
+  // Data fetching and state management
   const { recipes, pagination, isLoading, error, filters, setSearchTerm, setPage, refreshRecipes } = useRecipes();
 
-  // Modal states
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedRecipeForEdit, setSelectedRecipeForEdit] = useState<RecipeDTO | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedRecipeForDelete, setSelectedRecipeForDelete] = useState<RecipeDTO | null>(null);
+  // Preferences status
+  const { arePreferencesSet } = usePreferencesStatus();
 
-  // Preferences state - will be fetched on component mount
-  const [arePreferencesSet, setArePreferencesSet] = useState(false);
+  // Modal state management
+  const { editModal, deleteModal, openEditModal, closeEditModal, openDeleteModal, closeDeleteModal } =
+    useModalManagement();
 
-  // Check if user has preferences set
-  useEffect(() => {
-    const checkPreferences = async () => {
-      try {
-        const response = await fetch("/api/preferences");
-        if (response.ok) {
-          const preferences = await response.json();
-          // Check if user has any meaningful preferences set
-          setArePreferencesSet(
-            preferences.diet_type ||
-              preferences.daily_calorie_requirement ||
-              preferences.allergies ||
-              preferences.food_intolerances
-          );
-        }
-      } catch (err) {
-        console.error("Failed to check preferences:", err);
-        setArePreferencesSet(false);
-      }
-    };
+  // Recipe operations
+  const { updateRecipe, deleteRecipe } = useRecipeListOperations();
 
-    checkPreferences();
-  }, []);
-
+  // Event handlers
   const handleEditRecipe = (recipe: RecipeDTO) => {
-    setSelectedRecipeForEdit(recipe);
-    setIsEditModalOpen(true);
+    openEditModal(recipe);
   };
 
   const handleDeleteRecipe = (recipe: RecipeDTO) => {
-    setSelectedRecipeForDelete(recipe);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-    setSelectedRecipeForEdit(null);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setSelectedRecipeForDelete(null);
+    openDeleteModal(recipe);
   };
 
   const handleRecipeUpdate = async (recipeId: number, data: UpdateRecipeCommand) => {
     try {
-      const response = await fetch("/api/recipes/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ recipeId, ...data }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Nie znaleziono przepisu.");
-        }
-        if (response.status === 401) {
-          throw new Error("Sesja wygasła, zaloguj się ponownie.");
-        }
-        throw new Error("Nie udało się zaktualizować przepisu.");
-      }
-
-      toast.success("Przepis został zaktualizowany.");
-
-      handleCloseEditModal();
+      await updateRecipe(recipeId, data);
+      closeEditModal();
       await refreshRecipes();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.";
-      toast.error(errorMessage);
+    } catch (error) {
+      // Error is already handled and displayed by the hook
+      console.error("Failed to update recipe:", error);
     }
   };
 
   const handleConfirmDelete = async (recipeId: number) => {
     try {
-      const response = await fetch("/api/recipes/delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ recipeId }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error("Nie znaleziono przepisu.");
-        }
-        if (response.status === 401) {
-          throw new Error("Sesja wygasła, zaloguj się ponownie.");
-        }
-        throw new Error("Nie udało się usunąć przepisu.");
-      }
-
-      toast.success("Przepis został usunięty.");
-
-      handleCloseDeleteModal();
+      await deleteRecipe(recipeId);
+      closeDeleteModal();
       await refreshRecipes();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd.";
-      toast.error(errorMessage);
+    } catch (error) {
+      // Error is already handled and displayed by the hook
+      console.error("Failed to delete recipe:", error);
     }
   };
 
@@ -128,12 +59,19 @@ export default function RecipeListContainer() {
     window.location.href = "/preferences";
   };
 
+  // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-[400px]" data-testid="recipes-error-container">
         <div className="text-center">
-          <p className="text-lg text-red-600 mb-4">{error}</p>
-          <button onClick={refreshRecipes} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <p className="text-lg text-red-600 mb-4" data-testid="recipes-error-message">
+            {error}
+          </p>
+          <button
+            onClick={refreshRecipes}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            data-testid="recipes-retry-button"
+          >
             Spróbuj ponownie
           </button>
         </div>
@@ -142,9 +80,9 @@ export default function RecipeListContainer() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Search Input */}
-      <RecipeSearchInput
+    <div className="space-y-6" data-testid="recipe-list-container">
+      {/* Enhanced Search Input */}
+      <EnhancedRecipeSearchInput
         searchQuery={filters.searchTerm}
         onSearchQueryChange={setSearchTerm}
         placeholder="Wyszukaj przepisy..."
@@ -152,8 +90,10 @@ export default function RecipeListContainer() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center min-h-[200px]">
-          <div className="text-lg">Ładowanie przepisów...</div>
+        <div className="flex items-center justify-center min-h-[200px]" data-testid="recipes-loading-container">
+          <div className="text-lg" data-testid="recipes-loading-message">
+            Ładowanie przepisów...
+          </div>
         </div>
       )}
 
@@ -167,9 +107,9 @@ export default function RecipeListContainer() {
 
       {/* Edit Recipe Modal */}
       <EditRecipeModal
-        isOpen={isEditModalOpen}
-        recipeToEdit={selectedRecipeForEdit}
-        onClose={handleCloseEditModal}
+        isOpen={editModal.isOpen}
+        recipeToEdit={editModal.data}
+        onClose={closeEditModal}
         onRecipeUpdate={handleRecipeUpdate}
         preferencesAvailable={arePreferencesSet}
         onNavigateToPreferences={handleNavigateToPreferences}
@@ -177,9 +117,9 @@ export default function RecipeListContainer() {
 
       {/* Confirm Delete Modal */}
       <ConfirmDeleteModal
-        isOpen={isDeleteModalOpen}
-        recipeToDelete={selectedRecipeForDelete}
-        onClose={handleCloseDeleteModal}
+        isOpen={deleteModal.isOpen}
+        recipeToDelete={deleteModal.data}
+        onClose={closeDeleteModal}
         onConfirmDelete={handleConfirmDelete}
       />
     </div>

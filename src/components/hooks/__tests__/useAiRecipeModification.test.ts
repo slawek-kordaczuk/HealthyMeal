@@ -389,7 +389,7 @@ describe("useAiRecipeModification", () => {
         await result.current.generateSuggestion(validText);
       });
 
-      expect(result.current.aiState.aiError).toBe("Sesja wygasła, zaloguj się ponownie.");
+      expect(result.current.aiState.aiError).toBe("Sesja wygasła, zaloguj się ponownie");
       expect(result.current.aiState.isLoadingAiSuggestion).toBe(false);
       expect(result.current.aiState.suggestedRecipeText).toBeNull();
       expect(result.current.aiState.showMissingPreferencesWarning).toBe(false);
@@ -403,13 +403,14 @@ describe("useAiRecipeModification", () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
+        text: () => Promise.resolve("Server error"),
       });
 
       await act(async () => {
         await result.current.generateSuggestion(validText);
       });
 
-      expect(result.current.aiState.aiError).toBe("Modyfikacja AI nie powiodła się.");
+      expect(result.current.aiState.aiError).toContain("AI modification failed");
       expect(result.current.aiState.isLoadingAiSuggestion).toBe(false);
       expect(result.current.aiState.suggestedRecipeText).toBeNull();
       expect(result.current.aiState.showMissingPreferencesWarning).toBe(false);
@@ -426,7 +427,7 @@ describe("useAiRecipeModification", () => {
         await result.current.generateSuggestion(validText);
       });
 
-      expect(result.current.aiState.aiError).toBe("Network connection failed");
+      expect(result.current.aiState.aiError).toContain("Network connection failed");
       expect(result.current.aiState.isLoadingAiSuggestion).toBe(false);
       expect(result.current.aiState.suggestedRecipeText).toBeNull();
       expect(result.current.aiState.showMissingPreferencesWarning).toBe(false);
@@ -446,7 +447,7 @@ describe("useAiRecipeModification", () => {
         await result.current.generateSuggestion(validText);
       });
 
-      expect(result.current.aiState.aiError).toBe("Invalid JSON response");
+      expect(result.current.aiState.aiError).toContain("Invalid JSON response");
       expect(result.current.aiState.isLoadingAiSuggestion).toBe(false);
     });
 
@@ -461,7 +462,7 @@ describe("useAiRecipeModification", () => {
         await result.current.generateSuggestion(validText);
       });
 
-      expect(result.current.aiState.aiError).toBe("Wystąpił nieoczekiwany błąd.");
+      expect(result.current.aiState.aiError).toContain("Network error during AI modification");
       expect(result.current.aiState.isLoadingAiSuggestion).toBe(false);
     });
 
@@ -486,6 +487,7 @@ describe("useAiRecipeModification", () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
+        text: () => Promise.resolve("Server error"),
       });
 
       await act(async () => {

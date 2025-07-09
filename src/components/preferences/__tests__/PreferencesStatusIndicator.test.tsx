@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "../test/utils";
-import PreferencesStatusIndicator from "./PreferencesStatusIndicator";
+import { render, screen } from "../../../test/utils";
+import PreferencesStatusIndicator from "../PreferencesStatusIndicator";
 
 describe("PreferencesStatusIndicator", () => {
   it("should render alert when preferences are not set", () => {

@@ -36,8 +36,8 @@ export class LoginPage extends BasePage {
     await this.loginForm.submit();
   }
 
-  async login(email: string, password: string): Promise<void> {
-    await this.loginForm.login(email, password);
+  async login(): Promise<void> {
+    await this.loginForm.login();
   }
 
   async clickForgotPassword(): Promise<void> {
@@ -81,8 +81,8 @@ export class LoginPage extends BasePage {
   }
 
   // Page-specific actions that combine multiple components
-  async attemptLoginAndWaitForResult(email: string, password: string): Promise<"success" | "error"> {
-    await this.login(email, password);
+  async attemptLoginAndWaitForResult(): Promise<"success" | "error"> {
+    await this.login();
 
     // Wait for either navigation (success) or error message
     try {

@@ -67,29 +67,31 @@ export default function RecipePagination({ paginationData, onPageChange }: Recip
   const endItem = Math.min(page * limit, total);
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="text-sm text-gray-700">
+    <div className="flex items-center justify-between" data-testid="recipe-pagination-container">
+      <div className="text-sm text-gray-700" data-testid="recipe-pagination-info">
         Wyświetlanie {startItem}-{endItem} z {total} przepisów
       </div>
 
-      <Pagination>
+      <Pagination data-testid="recipe-pagination">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
               onClick={() => page > 1 && onPageChange(page - 1)}
               className={page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              data-testid="recipe-pagination-previous"
             />
           </PaginationItem>
 
           {pageNumbers.map((pageNum, index) => (
             <PaginationItem key={index}>
               {pageNum === "ellipsis" ? (
-                <PaginationEllipsis />
+                <PaginationEllipsis data-testid={`recipe-pagination-ellipsis-${index}`} />
               ) : (
                 <PaginationLink
                   onClick={() => onPageChange(pageNum)}
                   isActive={pageNum === page}
                   className="cursor-pointer"
+                  data-testid={`recipe-pagination-page-${pageNum}`}
                 >
                   {pageNum}
                 </PaginationLink>
@@ -101,6 +103,7 @@ export default function RecipePagination({ paginationData, onPageChange }: Recip
             <PaginationNext
               onClick={() => page < totalPages && onPageChange(page + 1)}
               className={page >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              data-testid="recipe-pagination-next"
             />
           </PaginationItem>
         </PaginationContent>

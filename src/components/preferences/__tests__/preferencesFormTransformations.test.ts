@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { PreferencesCommandDTO, PreferencesDTO } from "../../types/types";
+import type { PreferencesCommandDTO, PreferencesDTO } from "../../../types/types";
 
 // Extracted types from PreferencesForm for testing
 export interface PreferencesFormValues {

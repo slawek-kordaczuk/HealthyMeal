@@ -1,5 +1,6 @@
 import type { AstroCookies } from "astro";
 import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
 export const cookieOptions: CookieOptionsWithName = {
@@ -43,3 +44,29 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
 };
 
 export type SupabaseClient = ReturnType<typeof createSupabaseServerInstance>;
+
+/**
+ * Creates a simple Supabase client for teardown operations in test environment
+ * This client doesn't use cookies and is suitable for Node.js environments like Playwright
+ */
+export const createSupabaseTeardownClient = () => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Missing SUPABASE_URL or SUPABASE_KEY environment variables");
+  }
+
+  // Use service role key if available for teardown operations (bypasses RLS)
+  const keyToUse = supabaseServiceKey || supabaseKey;
+
+  return {
+    client: createClient<Database>(supabaseUrl, keyToUse),
+    isServiceRole: !!supabaseServiceKey,
+    url: supabaseUrl,
+    keyType: supabaseServiceKey ? "Service Role" : "Anon",
+  };
+};
+
+export type SupabaseTeardownClient = ReturnType<typeof createSupabaseTeardownClient>;

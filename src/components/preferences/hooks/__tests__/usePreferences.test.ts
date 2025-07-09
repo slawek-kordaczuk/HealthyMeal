@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { usePreferences } from "../usePreferences";
-import type { PreferencesDTO } from "../../../types/types";
+import { usePreferencesStatus } from "../usePreferencesStatus";
+import type { PreferencesDTO } from "../../../../types/types";
 
 // Mock fetch globally
 const mockFetch = vi.fn();
@@ -42,7 +42,7 @@ const createEmptyPreferences = (): PreferencesDTO => ({
   macro_distribution_carbohydrates: null,
 });
 
-describe("usePreferences", () => {
+describe("usePreferencesStatus", () => {
   beforeEach(() => {
     mockFetch.mockClear();
     mockConsoleError.mockClear();
@@ -65,7 +65,7 @@ describe("usePreferences", () => {
           })
       );
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       expect(result.current.preferences).toBe(null);
       expect(result.current.arePreferencesSet).toBe(false);
@@ -81,7 +81,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(createMockPreferences()),
       });
 
-      renderHook(() => usePreferences());
+      renderHook(() => usePreferencesStatus());
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith("/api/preferences", {
@@ -103,7 +103,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(mockPreferences),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -121,7 +121,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(null),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -139,7 +139,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(null),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -161,7 +161,7 @@ describe("usePreferences", () => {
         status: 401,
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -179,7 +179,7 @@ describe("usePreferences", () => {
         status: 500,
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -193,7 +193,7 @@ describe("usePreferences", () => {
     it("should handle network error", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -212,7 +212,7 @@ describe("usePreferences", () => {
         json: () => Promise.reject(new Error("Invalid JSON")),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -226,7 +226,7 @@ describe("usePreferences", () => {
     it("should handle non-Error object rejection", async () => {
       mockFetch.mockRejectedValueOnce("String error");
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -249,7 +249,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(null),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -266,7 +266,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(emptyPreferences),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -285,7 +285,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithDiet),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -304,7 +304,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithCalories),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -323,7 +323,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithAllergies),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -342,7 +342,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithIntolerances),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -361,7 +361,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithCuisines),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -380,7 +380,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithExclusions),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -399,7 +399,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithProtein),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -418,7 +418,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithFats),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -437,7 +437,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithCarbs),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -458,7 +458,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithMultiple),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -483,7 +483,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(initialPreferences),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -516,7 +516,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(initialPreferences),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -543,7 +543,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(createMockPreferences()),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -581,7 +581,7 @@ describe("usePreferences", () => {
       // Initial fetch with error
       mockFetch.mockRejectedValueOnce(new Error("Initial error"));
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -615,7 +615,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferences1),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       // Wait for initial fetch to complete
       await waitFor(() => {
@@ -651,7 +651,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferences),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -679,7 +679,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithZeroMacros),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -699,7 +699,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithZeroCalories),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -720,7 +720,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithNonZeroValues),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -741,7 +741,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithEmptyStrings),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -762,7 +762,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(preferencesWithWhitespace),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -781,7 +781,7 @@ describe("usePreferences", () => {
         json: () => Promise.resolve(invalidPreferences),
       });
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -805,7 +805,7 @@ describe("usePreferences", () => {
 
       mockFetch.mockReturnValueOnce(mockPromise);
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       // Initially loading
       expect(result.current.isLoading).toBe(true);
@@ -832,7 +832,7 @@ describe("usePreferences", () => {
 
       mockFetch.mockReturnValueOnce(mockPromise);
 
-      const { result } = renderHook(() => usePreferences());
+      const { result } = renderHook(() => usePreferencesStatus());
 
       // Initially loading
       expect(result.current.isLoading).toBe(true);

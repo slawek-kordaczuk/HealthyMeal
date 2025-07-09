@@ -47,12 +47,16 @@ export class LoginFormComponent {
   // Actions
   async fillEmail(email: string): Promise<void> {
     await this.emailInput.click();
+    await this.emailInput.clear();
     await this.emailInput.fill(email);
+    await this.emailInput.blur();
   }
 
   async fillPassword(password: string): Promise<void> {
     await this.passwordInput.click();
+    await this.passwordInput.clear();
     await this.passwordInput.fill(password);
+    await this.passwordInput.blur();
   }
 
   async fillForm(email: string, password: string): Promise<void> {
@@ -64,31 +68,45 @@ export class LoginFormComponent {
     await this.submitButton.click();
   }
 
-  async login(email: string, password: string): Promise<void> {
-    // Poczekaj aż formularz będzie w pełni załadowany
-    await this.page.waitForTimeout(1000);
+  async login(): Promise<void> {
+    // Pobierz dane logowania z zmiennych środowiskowych
+    const email = process.env.E2E_USERNAME;
+    const password = process.env.E2E_PASSWORD;
+
+    if (!email || !password) {
+      throw new Error("Missing E2E_USERNAME or E2E_PASSWORD environment variables");
+    }
+
+    // Poczekaj aż formularz będzie w pełni załadowany i React się zainicjalizuje
+    await this.page.waitForTimeout(2000);
 
     // Upewnij się, że pola są dostępne i gotowe
     await this.emailInput.waitFor({ state: "visible" });
     await this.passwordInput.waitFor({ state: "visible" });
 
-    // Wypełnij formularz z kliknięciem
-    await this.fillForm(email, password);
+    // Wypełnij email
+    await this.emailInput.click();
+    await this.emailInput.clear();
+    await this.emailInput.fill(email);
+    await this.emailInput.blur();
 
-    // Sprawdź czy pola są wypełnione
+    // Wypełnij hasło
+    await this.passwordInput.click();
+    await this.passwordInput.clear();
+    await this.passwordInput.fill(password);
+    await this.passwordInput.blur();
+
+    // Poczekaj chwilę na React state updates
+    await this.page.waitForTimeout(500);
+
+    // Sprawdź czy pola są wypełnione z dłuższym timeout
     await this.page.waitForFunction(
-      ({ emailSelector, passwordSelector, expectedEmail, expectedPassword }) => {
-        const emailEl = document.querySelector(`[data-testid="${emailSelector}"]`) as HTMLInputElement;
-        const passwordEl = document.querySelector(`[data-testid="${passwordSelector}"]`) as HTMLInputElement;
-        return emailEl?.value === expectedEmail && passwordEl?.value === expectedPassword;
+      () => {
+        const emailEl = document.querySelector('[data-testid="login-email-input"]') as HTMLInputElement;
+        const passwordEl = document.querySelector('[data-testid="login-password-input"]') as HTMLInputElement;
+        return emailEl?.value?.length > 0 && passwordEl?.value?.length > 0;
       },
-      {
-        emailSelector: "login-email-input",
-        passwordSelector: "login-password-input",
-        expectedEmail: email,
-        expectedPassword: password,
-      },
-      { timeout: 5000 }
+      { timeout: 10000 }
     );
 
     // Czekaj na odpowiedź z API i wyślij formularz

@@ -99,6 +99,16 @@ export interface UpdateRecipeCommand {
   recipe?: Json;
 }
 
+/**
+ * RecipeFormValues represents the form data structure for recipe forms.
+ * This is typically inferred from Zod schema validation.
+ */
+export interface RecipeFormValues {
+  name: string;
+  rating?: string;
+  recipeContent: string;
+}
+
 /* --------------------------- Recipe AI Modification --------------------------- */
 
 /**
