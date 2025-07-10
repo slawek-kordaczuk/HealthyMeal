@@ -13,6 +13,18 @@ export default defineConfig({
   server: { port: 3000 },
   vite: {
     plugins: [tailwindcss()],
+    define: {
+      global: "globalThis",
+    },
+    resolve: {
+      alias: {
+        // Polyfill for MessageChannel
+        "node:async_hooks": "data:text/javascript,export default {}",
+      },
+    },
+    optimizeDeps: {
+      exclude: ["react", "react-dom"],
+    },
   },
   adapter: cloudflare({
     platformProxy: {
