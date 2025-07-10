@@ -9,7 +9,7 @@ jobs:
     name: Lint Code
     runs-on: ubuntu-latest
     env:
-      NODE_ENV: production
+      NODE_ENV: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
