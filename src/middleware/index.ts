@@ -1,36 +1,3 @@
-// Polyfill MessageChannel for Cloudflare Workers
-
-if (typeof MessageChannel === "undefined") {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).MessageChannel = class MessageChannel {
-    port1: { postMessage: (message: unknown) => void; onmessage: ((event: { data: unknown }) => void) | null };
-    port2: { postMessage: (message: unknown) => void; onmessage: ((event: { data: unknown }) => void) | null };
-
-    constructor() {
-      this.port1 = {
-        postMessage: (message: unknown) => {
-          setTimeout(() => {
-            if (this.port2.onmessage) {
-              this.port2.onmessage({ data: message });
-            }
-          }, 0);
-        },
-        onmessage: null,
-      };
-      this.port2 = {
-        postMessage: (message: unknown) => {
-          setTimeout(() => {
-            if (this.port1.onmessage) {
-              this.port1.onmessage({ data: message });
-            }
-          }, 0);
-        },
-        onmessage: null,
-      };
-    }
-  };
-}
-
 import { createSupabaseServerInstance } from "../db/supabase.client";
 import { defineMiddleware } from "astro:middleware";
 
