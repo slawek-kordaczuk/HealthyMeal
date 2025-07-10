@@ -63,7 +63,14 @@ jobs:
         run: npm ci
 
       - name: Run unit tests with coverage
-        run: npm run test
+        run: npm run test:coverage
+
+      - name: Upload unit test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: coverage/
+          retention-days: 30
 
   e2e-tests:
     name: E2E Tests
