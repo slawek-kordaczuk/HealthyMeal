@@ -25,4 +25,4 @@ Testowanie - Kompleksowe rozwiązania do zapewnienia jakości kodu:
 
 CI/CD i Hosting:
 - Github Actions do tworzenia pipeline'ów CI/CD
-- DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+- Cloudflare Pages jako hosting aplikacji Astro (z wrangler-action@v3)

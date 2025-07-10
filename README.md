@@ -35,7 +35,19 @@ HealthyMeal is a web application designed to empower users to customize recipes 
    ```bash
    npm install
    ```
-3. Start the development server:
+3. Set up environment variables:
+   ```bash
+   # Create .env file with the following variables:
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+   
+   OPENROUTER_API_KEY=your_openrouter_api_key
+   OPENROUTER_ENDPOINT=https://openrouter.ai/api/v1/chat/completions
+   OPENROUTER_REFERER=https://your-app-domain.com
+   OPENROUTER_TITLE=HealthyMeal App
+   ```
+4. Start the development server:
    ```bash
    npm run dev
    ```
