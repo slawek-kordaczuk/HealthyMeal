@@ -22,9 +22,6 @@ export default defineConfig({
         "node:async_hooks": "data:text/javascript,export default {}",
       },
     },
-    optimizeDeps: {
-      exclude: ["react", "react-dom"],
-    },
   },
   adapter: cloudflare({
     platformProxy: {
