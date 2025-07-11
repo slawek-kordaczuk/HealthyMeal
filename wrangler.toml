@@ -5,9 +5,4 @@ compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
 [vars]
-NODE_ENV = "production"
-
-[[kv_namespaces]]
-binding = "SESSION"
-id = "session"
-preview_id = "session" 
+NODE_ENV = "production" 
