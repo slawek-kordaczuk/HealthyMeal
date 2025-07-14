@@ -4,6 +4,7 @@ import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import cloudflare from "@astrojs/cloudflare";
+import tailwind from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,6 +12,7 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   server: { port: 3000 },
   vite: {
+    plugins: [tailwind()],
     envPrefix: ["SUPABASE_", "OPENROUTER_", "PUBLIC_"],
     resolve: {
       alias: import.meta.env.PROD

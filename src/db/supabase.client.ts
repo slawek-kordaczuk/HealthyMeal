@@ -39,7 +39,20 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
         return cookies;
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => context.cookies.set(name, value, options));
+        cookiesToSet.forEach(({ name, value, options }) => {
+          try {
+            context.cookies.set(name, value, options);
+          } catch (error) {
+            // Silently ignore cookie setting errors when response has already been sent
+            // This is expected behavior for Supabase SSR in some scenarios
+            if (error instanceof Error && error.message.includes("response has already been sent")) {
+              // Safe to ignore - this happens during async auth operations
+              return;
+            }
+            // Re-throw other errors
+            throw error;
+          }
+        });
       },
     },
   });
