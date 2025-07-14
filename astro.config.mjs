@@ -11,7 +11,7 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   server: { port: 3000 },
   vite: {
-    envPrefix: ["SUPABASE_", "PUBLIC_"],
+    envPrefix: ["SUPABASE_", "OPENROUTER_", "PUBLIC_"],
     resolve: {
       alias: import.meta.env.PROD
         ? {
