@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { loginFormSchema, type LoginFormValues } from "../LoginForm";
+import { loginFormSchema, type LoginFormValues } from "../components/LoginForm";
 
 describe("LoginForm Zod Schema Validation", () => {
   describe("✅ Happy Path - Valid Data", () => {

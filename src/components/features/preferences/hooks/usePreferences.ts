@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import type { PreferencesDTO, PreferencesCommandDTO } from "@/types/types";
 import type { UseFormReturn } from "react-hook-form";
-import type { PreferencesFormValues } from "../PreferencesForm";
+import type { PreferencesFormValues } from "../components/PreferencesForm";
 
 interface UsePreferencesOptions {
   form: UseFormReturn<PreferencesFormValues>;

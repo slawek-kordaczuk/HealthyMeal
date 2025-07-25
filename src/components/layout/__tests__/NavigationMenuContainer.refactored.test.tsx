@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { NavigationMenuContainer } from "../NavigationMenuContainer";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../features/auth/hooks/useAuth";
 
 // Mock the useAuth hook
-vi.mock("../hooks/useAuth");
+vi.mock("../../features/auth/hooks/useAuth");
 const mockUseAuth = vi.mocked(useAuth);
 
 describe("NavigationMenuContainer (Refactored)", () => {

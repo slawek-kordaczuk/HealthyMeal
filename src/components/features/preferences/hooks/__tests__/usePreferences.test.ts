@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { usePreferencesStatus } from "../usePreferencesStatus";
-import type { PreferencesDTO } from "../../../../types/types";
+import type { PreferencesDTO } from "@/types/types";
 
 // Mock fetch globally
 const mockFetch = vi.fn();

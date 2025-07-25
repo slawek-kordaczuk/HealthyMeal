@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { registerFormSchema, type RegisterFormValues } from "../RegisterForm";
+import { registerFormSchema, type RegisterFormValues } from "../components/RegisterForm";
 
 describe("RegisterForm Zod Schema Validation", () => {
   describe("✅ Happy Path - Valid Data", () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useModalManagement } from "../useModalManagement";
-import type { RecipeDTO } from "../../../types/types";
+import { useModalManagement } from "@/components/common/useModalManagement";
+import type { RecipeDTO } from "@/types/types";
 
 describe("useModalManagement", () => {
   const mockRecipe: RecipeDTO = {

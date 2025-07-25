@@ -2,9 +2,9 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import RecipeRow from "../RecipeRow";
+import RecipeRow from "../components/RecipeRow";
 import type { RecipeDTO } from "@/types/types";
-import type { Json } from "../../../db/database.types";
+import type { Json } from "@/db/database.types";
 
 // Mock data factories
 const createMockRecipe = (overrides?: Partial<RecipeDTO>): RecipeDTO => ({

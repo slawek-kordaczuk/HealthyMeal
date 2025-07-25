@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { RecipeDTO } from "../../types/types";
+import type { RecipeDTO } from "@/types/types";
 
 interface ModalState<T = unknown> {
   isOpen: boolean;

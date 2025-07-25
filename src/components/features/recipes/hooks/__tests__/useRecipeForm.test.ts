@@ -3,7 +3,7 @@ import { renderHook, act } from "@testing-library/react";
 import { useRecipeForm } from "../useRecipeForm";
 import type { RecipeDTO } from "@/types/types";
 import type { EditRecipeFormViewModel } from "@/types/viewModels";
-import type { Json } from "../../../db/database.types";
+import type { Json } from "@/db/database.types";
 
 // Mock data factories
 const createMockRecipe = (overrides?: Partial<RecipeDTO>): RecipeDTO => ({

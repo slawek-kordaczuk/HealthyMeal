@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import type { EditRecipeFormViewModel } from "@/types/viewModels";
 import type { RecipeDTO } from "@/types/types";
-import type { Json } from "../../db/database.types";
+import type { Json } from "@/db/database.types";
 
 interface FormErrors {
   name?: string;
