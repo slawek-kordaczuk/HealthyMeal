@@ -24,18 +24,18 @@ export class RecipeModificationService {
 
     // Set specialized system message for recipe modification
     this.openRouterService.setSystemMessage(
-      `You are a professional nutritionist and chef assistant specializing in recipe modifications. 
-      Your task is to modify recipes according to specific dietary preferences and restrictions.
+      `Jesteś profesjonalnym dietetykiem i asystentem kucharskim specjalizującym się w modyfikacji przepisów. 
+      Twoim zadaniem jest modyfikowanie przepisów zgodnie z określonymi preferencjami dietetycznymi i ograniczeniami.
       
-      Guidelines:
-      - Maintain the essence and flavor profile of the original recipe
-      - Suggest appropriate ingredient substitutions based on dietary restrictions
-      - Adjust portion sizes and nutritional content as needed
-      - Provide clear, practical cooking instructions
-      - Ensure the modified recipe is safe and nutritionally balanced
-      - If a modification is not possible or safe, explain why and suggest alternatives
+      Wytyczne:
+      - Zachowaj esencję i profil smakowy oryginalnego przepisu
+      - Zaproponuj odpowiednie substytucje składników na podstawie ograniczeń dietetycznych
+      - Dostosuj wielkości porcji i zawartość odżywczą zgodnie z potrzebami
+      - Zapewnij jasne, praktyczne instrukcje gotowania
+      - Upewnij się, że zmodyfikowany przepis jest bezpieczny i zbilansowany pod względem odżywczym
+      - Jeśli modyfikacja nie jest możliwa lub bezpieczna, wyjaśnij dlaczego i zaproponuj alternatywy
       
-      Always respond with a complete, modified recipe in a clear, structured format.`
+      Zawsze odpowiadaj kompletnym, zmodyfikowanym przepisem w jasnym, uporządkowanym formacie w języku polskim.`
     );
   }
 
@@ -97,66 +97,66 @@ export class RecipeModificationService {
 
     // Add diet type
     if (preferences.diet_type) {
-      preferencesContext.push(`Diet type: ${preferences.diet_type}`);
+      preferencesContext.push(`Typ diety: ${preferences.diet_type}`);
     }
 
     // Add calorie requirements
     if (preferences.daily_calorie_requirement) {
-      preferencesContext.push(`Target daily calories: ${preferences.daily_calorie_requirement}`);
+      preferencesContext.push(`Docelowe dzienne kalorie: ${preferences.daily_calorie_requirement}`);
     }
 
     // Add allergies
     if (preferences.allergies) {
-      preferencesContext.push(`Allergies: ${preferences.allergies}`);
+      preferencesContext.push(`Alergie: ${preferences.allergies}`);
     }
 
     // Add food intolerances
     if (preferences.food_intolerances) {
-      preferencesContext.push(`Food intolerances: ${preferences.food_intolerances}`);
+      preferencesContext.push(`Nietolerancje pokarmowe: ${preferences.food_intolerances}`);
     }
 
     // Add preferred cuisines
     if (preferences.preferred_cuisines) {
-      preferencesContext.push(`Preferred cuisines: ${preferences.preferred_cuisines}`);
+      preferencesContext.push(`Preferowane kuchnie: ${preferences.preferred_cuisines}`);
     }
 
     // Add excluded ingredients
     if (preferences.excluded_ingredients) {
-      preferencesContext.push(`Ingredients to avoid: ${preferences.excluded_ingredients}`);
+      preferencesContext.push(`Składniki do unikania: ${preferences.excluded_ingredients}`);
     }
 
     // Add macro distribution
     const macros = [];
     if (preferences.macro_distribution_protein) {
-      macros.push(`Protein: ${preferences.macro_distribution_protein}%`);
+      macros.push(`Białko: ${preferences.macro_distribution_protein}%`);
     }
     if (preferences.macro_distribution_fats) {
-      macros.push(`Fats: ${preferences.macro_distribution_fats}%`);
+      macros.push(`Tłuszcze: ${preferences.macro_distribution_fats}%`);
     }
     if (preferences.macro_distribution_carbohydrates) {
-      macros.push(`Carbohydrates: ${preferences.macro_distribution_carbohydrates}%`);
+      macros.push(`Węglowodany: ${preferences.macro_distribution_carbohydrates}%`);
     }
     if (macros.length > 0) {
-      preferencesContext.push(`Macro distribution: ${macros.join(", ")}`);
+      preferencesContext.push(`Rozkład makroskładników: ${macros.join(", ")}`);
     }
 
-    const prompt = `Please modify the following recipe according to these dietary preferences and restrictions:
+    const prompt = `Proszę zmodyfikuj poniższy przepis zgodnie z tymi preferencjami i ograniczeniami dietetycznymi:
 
-DIETARY PREFERENCES:
+PREFERENCJE DIETETYCZNE:
 ${preferencesContext.join("\n")}
 
-ORIGINAL RECIPE:
+ORYGINALNY PRZEPIS:
 ${recipeText}
 
-INSTRUCTIONS:
-1. Modify the recipe to accommodate all dietary restrictions and preferences
-2. Suggest ingredient substitutions where necessary
-3. Adjust portions if needed to meet calorie requirements
-4. Ensure the recipe remains practical and delicious
-5. Provide the complete modified recipe with ingredients list and cooking instructions
-6. If any modification is not possible, explain why and suggest alternatives
+INSTRUKCJE:
+1. Zmodyfikuj przepis, aby uwzględnić wszystkie ograniczenia i preferencje dietetyczne
+2. Zaproponuj substytucje składników tam, gdzie to konieczne
+3. Dostosuj porcje w razie potrzeby, aby spełnić wymagania kaloryczne
+4. Upewnij się, że przepis pozostaje praktyczny i smakowity
+5. Podaj kompletny zmodyfikowany przepis z listą składników i instrukcjami gotowania
+6. Jeśli jakakolwiek modyfikacja nie jest możliwa, wyjaśnij dlaczego i zaproponuj alternatywy
 
-Please provide the modified recipe in a clear, structured format.`;
+Proszę podaj zmodyfikowany przepis w jasnym, uporządkowanym formacie w języku polskim.`;
 
     return prompt;
   }
