@@ -189,6 +189,10 @@ describe("OpenRouterService.sendMessage()", () => {
           top_p: 1.0,
           frequency_penalty: 0,
           presence_penalty: 0,
+          provider: {
+            allow_fallbacks: false,
+            require_parameters: true,
+          },
         });
       }
     });

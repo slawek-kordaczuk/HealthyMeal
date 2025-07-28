@@ -166,6 +166,11 @@ export class OpenRouterService {
       messages,
       temperature: modelParams.temperature,
       max_tokens: modelParams.max_tokens,
+      // Add provider configuration to disable fallbacks and enforce specific model
+      provider: {
+        allow_fallbacks: false, // Disable automatic fallbacks to other providers
+        require_parameters: true, // Only use providers that support all parameters
+      },
     };
 
     // Add optional parameters if they exist

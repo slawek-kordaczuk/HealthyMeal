@@ -140,7 +140,7 @@ describe("RecipeModificationService", () => {
         expect(result).toBe(mockModifiedRecipe);
         expect(mockPreferencesService.getUserPreferences).toHaveBeenCalledWith(mockUserId);
         expect(mockOpenRouterService.sendMessage).toHaveBeenCalledWith(
-          expect.stringContaining("DIETARY PREFERENCES:"),
+          expect.stringContaining("PREFERENCJE DIETETYCZNE:"),
           expect.objectContaining({
             temperature: 0.7,
             max_tokens: 2000,
@@ -154,13 +154,13 @@ describe("RecipeModificationService", () => {
 
         // Assert
         const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-        expect(callArgs).toContain("Diet type: vegetarian");
-        expect(callArgs).toContain("Target daily calories: 2000");
-        expect(callArgs).toContain("Allergies: eggs");
-        expect(callArgs).toContain("Food intolerances: lactose");
-        expect(callArgs).toContain("Preferred cuisines: Italian");
-        expect(callArgs).toContain("Ingredients to avoid: meat");
-        expect(callArgs).toContain("Macro distribution: Protein: 25%, Fats: 30%, Carbohydrates: 45%");
+        expect(callArgs).toContain("Typ diety: vegetarian");
+        expect(callArgs).toContain("Docelowe dzienne kalorie: 2000");
+        expect(callArgs).toContain("Alergie: eggs");
+        expect(callArgs).toContain("Nietolerancje pokarmowe: lactose");
+        expect(callArgs).toContain("Preferowane kuchnie: Italian");
+        expect(callArgs).toContain("Składniki do unikania: meat");
+        expect(callArgs).toContain("Rozkład makroskładników: Białko: 25%, Tłuszcze: 30%, Węglowodany: 45%");
       });
 
       it("should handle preferences with minimal data", async () => {
@@ -186,10 +186,10 @@ describe("RecipeModificationService", () => {
 
         // Assert
         const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-        expect(callArgs).toContain("Diet type: standard");
-        expect(callArgs).not.toContain("Target daily calories:");
-        expect(callArgs).not.toContain("Allergies:");
-        expect(callArgs).not.toContain("Food intolerances:");
+        expect(callArgs).toContain("Typ diety: standard");
+        expect(callArgs).not.toContain("Docelowe dzienne kalorie:");
+        expect(callArgs).not.toContain("Alergie:");
+        expect(callArgs).not.toContain("Nietolerancje pokarmowe:");
       });
 
       it("should handle partial macro distribution", async () => {
@@ -208,8 +208,8 @@ describe("RecipeModificationService", () => {
 
         // Assert
         const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-        expect(callArgs).toContain("Macro distribution: Protein: 30%, Carbohydrates: 50%");
-        expect(callArgs).not.toContain("Fats:");
+        expect(callArgs).toContain("Rozkład makroskładników: Białko: 30%, Węglowodany: 50%");
+        expect(callArgs).not.toContain("Tłuszcze:");
       });
     });
 
@@ -465,7 +465,7 @@ describe("RecipeModificationService", () => {
       it("should set correct system message", () => {
         // Assert
         expect(mockOpenRouterService.setSystemMessage).toHaveBeenCalledWith(
-          expect.stringContaining("professional nutritionist and chef assistant")
+          expect.stringContaining("profesjonalnym dietetykiem i asystentem kucharskim")
         );
       });
     });
@@ -485,7 +485,7 @@ describe("RecipeModificationService", () => {
         // Assert - Verify complete workflow
         expect(mockPreferencesService.getUserPreferences).toHaveBeenCalledWith(mockUserId);
         expect(mockOpenRouterService.sendMessage).toHaveBeenCalledWith(
-          expect.stringContaining("ORIGINAL RECIPE:"),
+          expect.stringContaining("ORYGINALNY PRZEPIS:"),
           expect.objectContaining({
             temperature: 0.7,
             max_tokens: 2000,
@@ -513,10 +513,10 @@ describe("RecipeModificationService", () => {
 
         // Assert
         const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-        expect(callArgs).toContain("Diet type: vegan");
-        expect(callArgs).toContain("Allergies: nuts, shellfish, eggs");
-        expect(callArgs).toContain("Food intolerances: lactose, gluten");
-        expect(callArgs).toContain("Ingredients to avoid: meat, dairy, wheat");
+        expect(callArgs).toContain("Typ diety: vegan");
+        expect(callArgs).toContain("Alergie: nuts, shellfish, eggs");
+        expect(callArgs).toContain("Nietolerancje pokarmowe: lactose, gluten");
+        expect(callArgs).toContain("Składniki do unikania: meat, dairy, wheat");
       });
     });
   });

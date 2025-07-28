@@ -99,22 +99,23 @@ export class LoginFormComponent {
     // Poczekaj chwilę na React state updates
     await this.page.waitForTimeout(500);
 
-    // Sprawdź czy pola są wypełnione z dłuższym timeout
-    await this.page.waitForFunction(
-      () => {
-        const emailEl = document.querySelector('[data-testid="login-email-input"]') as HTMLInputElement;
-        const passwordEl = document.querySelector('[data-testid="login-password-input"]') as HTMLInputElement;
-        return emailEl?.value?.length > 0 && passwordEl?.value?.length > 0;
-      },
-      { timeout: 10000 }
-    );
+    await this.page.locator('[data-testid="login-email-input"]').waitFor({ state: "visible" });
+    await this.page.locator('[data-testid="login-password-input"]').waitFor({ state: "visible" });
 
-    // Czekaj na odpowiedź z API i wyślij formularz
+    // Sprawdź wartości pól
+    const emailInput = this.page.getByTestId("login-email-input");
+    const passwordInput = this.page.getByTestId("login-password-input");
+    await emailInput.waitFor({ state: "visible", timeout: 10000 });
+    await passwordInput.waitFor({ state: "visible", timeout: 10000 });
+
     const loginPromise = this.page.waitForResponse("/api/auth/login");
     await this.submit();
 
-    // Czekaj na odpowiedź
-    await loginPromise;
+    const loginResponse = await loginPromise;
+    if (loginResponse.status() !== 200) {
+      const responseText = await loginResponse.text();
+      throw new Error(`Login failed with status ${loginResponse.status()}: ${responseText}`);
+    }
   }
 
   async clickForgotPassword(): Promise<void> {

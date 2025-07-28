@@ -21,6 +21,17 @@ export interface ModelParams {
   presence_penalty?: number;
 }
 
+export interface ProviderConfig {
+  allow_fallbacks?: boolean;
+  require_parameters?: boolean;
+  data_collection?: "allow" | "deny";
+  order?: string[];
+  only?: string[];
+  ignore?: string[];
+  quantizations?: string[];
+  sort?: "price" | "throughput" | "latency";
+}
+
 export interface OpenRouterMessage {
   role: "system" | "user" | "assistant";
   content: string;
@@ -35,6 +46,7 @@ export interface OpenRouterRequestPayload {
   top_p?: number;
   frequency_penalty?: number;
   presence_penalty?: number;
+  provider?: ProviderConfig;
 }
 
 export interface ResponseFormat {
