@@ -161,10 +161,10 @@ describe("RecipeModificationService - Edge Cases", () => {
 
       // Assert
       const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-      expect(callArgs).toContain("Diet type: vegan");
-      expect(callArgs).toContain("Allergies: soy, nuts");
-      expect(callArgs).toContain("Ingredients to avoid: meat, dairy, eggs, honey");
-      expect(callArgs).toContain("Target daily calories: 1800");
+      expect(callArgs).toContain("Typ diety: vegan");
+      expect(callArgs).toContain("Alergie: soy, nuts");
+      expect(callArgs).toContain("Składniki do unikania: meat, dairy, eggs, honey");
+      expect(callArgs).toContain("Docelowe dzienne kalorie: 1800");
     });
 
     it("should handle ketogenic diet with high fat requirements", async () => {
@@ -176,10 +176,10 @@ describe("RecipeModificationService - Edge Cases", () => {
 
       // Assert
       const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-      expect(callArgs).toContain("Diet type: ketogenic");
-      expect(callArgs).toContain("Food intolerances: gluten");
-      expect(callArgs).toContain("Macro distribution: Protein: 25%, Fats: 70%, Carbohydrates: 5%");
-      expect(callArgs).toContain("Ingredients to avoid: grains, sugar, potatoes");
+      expect(callArgs).toContain("Typ diety: ketogenic");
+      expect(callArgs).toContain("Nietolerancje pokarmowe: gluten");
+      expect(callArgs).toContain("Rozkład makroskładników: Białko: 25%, Tłuszcze: 70%, Węglowodany: 5%");
+      expect(callArgs).toContain("Składniki do unikania: grains, sugar, potatoes");
     });
 
     it("should handle complex allergy restrictions", async () => {
@@ -191,11 +191,11 @@ describe("RecipeModificationService - Edge Cases", () => {
 
       // Assert
       const callArgs = mockOpenRouterService.sendMessage.mock.calls[0][0];
-      expect(callArgs).toContain("Diet type: gluten-free");
-      expect(callArgs).toContain("Allergies: shellfish, tree nuts, peanuts, eggs");
-      expect(callArgs).toContain("Food intolerances: lactose, fructose");
-      expect(callArgs).toContain("Preferred cuisines: Thai, Indian, Mexican");
-      expect(callArgs).toContain("Ingredients to avoid: wheat, barley, rye, oats");
+      expect(callArgs).toContain("Typ diety: gluten-free");
+      expect(callArgs).toContain("Alergie: shellfish, tree nuts, peanuts, eggs");
+      expect(callArgs).toContain("Nietolerancje pokarmowe: lactose, fructose");
+      expect(callArgs).toContain("Preferowane kuchnie: Thai, Indian, Mexican");
+      expect(callArgs).toContain("Składniki do unikania: wheat, barley, rye, oats");
     });
   });
 

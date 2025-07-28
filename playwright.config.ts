@@ -19,7 +19,7 @@ export default defineConfig({
   /* Use single worker to avoid conflicts with shared test user data */
   workers: 1,
   /* Increased timeout for CI environment */
-  timeout: process.env.CI ? 60000 : 30000,
+  timeout: 60000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

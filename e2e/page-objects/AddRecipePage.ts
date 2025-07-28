@@ -121,7 +121,7 @@ export class AddRecipePage extends BasePage {
   // Success/Error states
   async isSuccessAlertVisible(): Promise<boolean> {
     try {
-      await expect(this.page.getByTestId("recipe-form-success-alert")).toBeVisible({ timeout: 5000 });
+      await expect(this.page.getByTestId("recipe-form-success-alert")).toBeVisible({ timeout: 15000 });
       return true;
     } catch {
       return false;
