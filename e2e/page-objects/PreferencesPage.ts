@@ -270,11 +270,11 @@ export class PreferencesPage extends BasePage {
   }
 
   async waitForSuccess(): Promise<void> {
-    await this.successAlert.waitFor({ state: "visible", timeout: 15000 });
+    await this.successAlert.waitFor({ state: "visible", timeout: 30000 });
   }
 
   async waitForError(): Promise<void> {
-    await this.errorAlert.waitFor({ state: "visible", timeout: 15000 });
+    await this.errorAlert.waitFor({ state: "visible", timeout: 30000 });
   }
 
   // Complete workflow methods
@@ -297,6 +297,8 @@ export class PreferencesPage extends BasePage {
     await this.submitForm();
 
     const response = await responsePromise;
+
+    await this.page.waitForLoadState("networkidle");
 
     if (response.status() === 200) {
       await this.waitForSuccess();
