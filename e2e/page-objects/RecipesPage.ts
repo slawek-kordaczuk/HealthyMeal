@@ -108,10 +108,9 @@ export class RecipesPage extends BasePage {
 
   // Recipe actions
   async clickEditRecipe(recipeId: string) {
-    const editButton = this.page.getByTestId(`recipe-edit-button-${recipeId}`);
-    await expect(editButton).toBeVisible();
-    await expect(editButton).toBeEnabled();
-    await editButton.click();
+    const recipeRow = this.page.getByTestId(`recipe-row-${recipeId}`);
+    await expect(recipeRow).toBeVisible();
+    await recipeRow.click();
   }
 
   async clickDeleteRecipe(recipeId: string) {
