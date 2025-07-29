@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ url, locals }): Promise<Response> => {
 
     // Parse query parameters
     const query: GetRecipesQuery = {
-      searchTerm: url.searchParams.get("search") || undefined,
+      searchTerm: url.searchParams.get("searchTerm") || undefined,
       page: parseInt(url.searchParams.get("page") || "1"),
       limit: parseInt(url.searchParams.get("limit") || "10"),
       sortBy: (url.searchParams.get("sortBy") as GetRecipesQuery["sortBy"]) || "created_at",
