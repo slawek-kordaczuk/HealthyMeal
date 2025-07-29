@@ -48,14 +48,14 @@ describe("RecipeRow", () => {
       expect(cells).toHaveLength(5); // name, rating, source, date, actions
     });
 
-    it("should render edit and delete buttons", () => {
+    it("should render clickable row and delete button", () => {
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
+      const row = screen.getByRole("row");
       const deleteButton = screen.getByRole("button", { name: /usuń przepis/i });
 
-      expect(editButton).toBeInTheDocument();
+      expect(row).toHaveClass("cursor-pointer", "hover:bg-gray-50", "transition-colors");
       expect(deleteButton).toBeInTheDocument();
     });
   });
@@ -240,14 +240,14 @@ describe("RecipeRow", () => {
     });
   });
 
-  describe("Button Interactions", () => {
-    it("should call onEdit with recipe when edit button is clicked", async () => {
+  describe("Row Click Interactions", () => {
+    it("should call onEdit with recipe when row is clicked", async () => {
       const user = userEvent.setup();
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
-      await user.click(editButton);
+      const row = screen.getByRole("row");
+      await user.click(row);
 
       expect(mockOnEdit).toHaveBeenCalledTimes(1);
       expect(mockOnEdit).toHaveBeenCalledWith(recipe);
@@ -263,52 +263,57 @@ describe("RecipeRow", () => {
 
       expect(mockOnDelete).toHaveBeenCalledTimes(1);
       expect(mockOnDelete).toHaveBeenCalledWith(recipe);
+      expect(mockOnEdit).not.toHaveBeenCalled();
     });
 
-    it("should handle rapid clicking without multiple calls", async () => {
+    it("should not call onEdit when delete button is clicked (event propagation stopped)", async () => {
       const user = userEvent.setup();
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
+      const deleteButton = screen.getByRole("button", { name: /usuń przepis/i });
+      await user.click(deleteButton);
+
+      expect(mockOnDelete).toHaveBeenCalledTimes(1);
+      expect(mockOnEdit).not.toHaveBeenCalled();
+    });
+
+    it("should handle rapid row clicking without multiple calls", async () => {
+      const user = userEvent.setup();
+      const recipe = createMockRecipe();
+      render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+
+      const row = screen.getByRole("row");
 
       // Rapid clicks
-      await user.click(editButton);
-      await user.click(editButton);
-      await user.click(editButton);
+      await user.click(row);
+      await user.click(row);
+      await user.click(row);
 
       // Should be called for each click (no debouncing in component)
       expect(mockOnEdit).toHaveBeenCalledTimes(3);
     });
 
-    it("should maintain button functionality after multiple renders", async () => {
+    it("should maintain row click functionality after multiple renders", async () => {
       const user = userEvent.setup();
       const recipe1 = createMockRecipe({ id: 1, name: "Recipe 1" });
       const recipe2 = createMockRecipe({ id: 2, name: "Recipe 2" });
 
       const { rerender } = render(<RecipeRow recipe={recipe1} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
-      await user.click(editButton);
+      const row = screen.getByRole("row");
+      await user.click(row);
       expect(mockOnEdit).toHaveBeenCalledWith(recipe1);
 
       // Re-render with different recipe
       rerender(<RecipeRow recipe={recipe2} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      await user.click(editButton);
+      await user.click(row);
       expect(mockOnEdit).toHaveBeenCalledWith(recipe2);
     });
   });
 
   describe("Button Styling and Accessibility", () => {
-    it("should apply correct styling to edit button", () => {
-      const recipe = createMockRecipe();
-      render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
-
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
-      expect(editButton).toHaveClass("h-8", "w-8", "p-0");
-    });
-
     it("should apply correct styling to delete button", () => {
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
@@ -321,19 +326,16 @@ describe("RecipeRow", () => {
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
       const deleteButton = screen.getByRole("button", { name: /usuń przepis/i });
 
-      expect(editButton).toHaveAccessibleName("Edytuj przepis");
       expect(deleteButton).toHaveAccessibleName("Usuń przepis");
     });
 
-    it("should contain proper icons in buttons", () => {
+    it("should contain proper icons in delete button", () => {
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
       // Check for actual Lucide icon classes based on rendered output
-      expect(document.querySelector(".lucide-square-pen")).toBeInTheDocument();
       expect(document.querySelector(".lucide-trash2")).toBeInTheDocument();
     });
 
@@ -341,10 +343,18 @@ describe("RecipeRow", () => {
       const recipe = createMockRecipe();
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const srTexts = screen.getAllByText(/edytuj przepis|usuń przepis/i);
+      const srTexts = screen.getAllByText(/usuń przepis/i);
       const hiddenTexts = srTexts.filter((element) => element.classList.contains("sr-only"));
 
-      expect(hiddenTexts).toHaveLength(2);
+      expect(hiddenTexts).toHaveLength(1);
+    });
+
+    it("should apply hover styles to the row", () => {
+      const recipe = createMockRecipe();
+      render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+
+      const row = screen.getByRole("row");
+      expect(row).toHaveClass("cursor-pointer", "hover:bg-gray-50", "transition-colors");
     });
   });
 
@@ -382,8 +392,8 @@ describe("RecipeRow", () => {
       const recipe = createMockRecipe({ id: Number.MAX_SAFE_INTEGER });
       render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
-      fireEvent.click(editButton);
+      const row = screen.getByRole("row");
+      fireEvent.click(row);
 
       expect(mockOnEdit).toHaveBeenCalledWith(recipe);
     });
@@ -426,15 +436,15 @@ describe("RecipeRow", () => {
 
       const { rerender } = render(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
-      await user.click(editButton);
+      const row = screen.getByRole("row");
+      await user.click(row);
 
       expect(mockOnEdit).toHaveBeenCalledTimes(1);
 
       // Re-render with same props
       rerender(<RecipeRow recipe={recipe} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
-      await user.click(editButton);
+      await user.click(row);
       expect(mockOnEdit).toHaveBeenCalledTimes(2);
     });
   });
@@ -499,8 +509,8 @@ describe("RecipeRow", () => {
 
       render(<RecipeRow recipe={recipe} onEdit={typedOnEdit} onDelete={typedOnDelete} />);
 
-      const editButton = screen.getByRole("button", { name: /edytuj przepis/i });
-      fireEvent.click(editButton);
+      const row = screen.getByRole("row");
+      fireEvent.click(row);
     });
   });
 });

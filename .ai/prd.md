@@ -64,6 +64,7 @@ Użytkownicy mają problem z dostosowaniem dostępnych w sieci przepisów do swo
   Opis: Jako użytkownik chcę mieć możliwość przeglądania, edytowania oraz usuwania zapisanych przepisów, aby móc zarządzać swoimi zasobami w aplikacji.
   Kryteria akceptacji:
     - Użytkownik może zobaczyć listę swoich przepisów.
+    - Użytkownik może podejrzeć treść przepisu.
     - Każdy przepis ma opcje ręcznej edycji, modyfikuj przy pomocy AI oraz usunięcia.
     - System potwierdza akcję usunięcia, aby zapobiec przypadkowym usunięciom.
 
