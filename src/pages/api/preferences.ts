@@ -63,6 +63,14 @@ export const GET: APIRoute = async ({ locals }) => {
     const preferencesService = new PreferencesService(locals.supabase);
     const preferences = await preferencesService.getUserPreferences(locals.user.id);
 
+    // Return 404 when user has no preferences - this aligns with client expectations
+    if (!preferences) {
+      return new Response(JSON.stringify({ error: "No preferences found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify(preferences), {
       status: 200,
       headers: { "Content-Type": "application/json" },

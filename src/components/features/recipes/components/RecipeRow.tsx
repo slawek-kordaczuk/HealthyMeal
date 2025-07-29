@@ -1,7 +1,7 @@
 import React from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Star } from "lucide-react";
+import { Trash2, Star } from "lucide-react";
 import type { RecipeDTO } from "@/types/types";
 
 interface RecipeRowProps {
@@ -32,8 +32,21 @@ export default function RecipeRow({ recipe, onEdit, onDelete }: RecipeRowProps) 
     );
   };
 
+  const handleRowClick = () => {
+    onEdit(recipe);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Zapobiega otwieraniu modala edycji gdy klikamy usuń
+    onDelete(recipe);
+  };
+
   return (
-    <TableRow data-testid={`recipe-row-${recipe.id}`}>
+    <TableRow
+      data-testid={`recipe-row-${recipe.id}`}
+      onClick={handleRowClick}
+      className="cursor-pointer hover:bg-gray-50 transition-colors"
+    >
       <TableCell className="font-medium">
         <div className="max-w-[200px] truncate" title={recipe.name} data-testid={`recipe-name-${recipe.id}`}>
           {recipe.name}
@@ -57,17 +70,7 @@ export default function RecipeRow({ recipe, onEdit, onDelete }: RecipeRowProps) 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onEdit(recipe)}
-            className="h-8 w-8 p-0"
-            data-testid={`recipe-edit-button-${recipe.id}`}
-          >
-            <Edit className="h-4 w-4" />
-            <span className="sr-only">Edytuj przepis</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDelete(recipe)}
+            onClick={handleDeleteClick}
             className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
             data-testid={`recipe-delete-button-${recipe.id}`}
           >
