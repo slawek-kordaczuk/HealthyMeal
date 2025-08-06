@@ -14,9 +14,8 @@ Użytkownicy mają problem z dostosowaniem dostępnych w sieci przepisów do swo
 5. Mechanizm zatwierdzania zmian przepisu – użytkownik decyduje, czy zatwierdzić czy odrzucić zmodyfikowaną wersję.
 6. Wyświetlanie komunikatu przypominającego o konfiguracji preferencji żywieniowych, jeśli użytkownik próbuje modyfikować przepis bez ich uzupełnienia.
 7. Spójny design oraz wspólna nawigacja pomiędzy trzema głównymi interfejsami: preferencje, dodawanie/modyfikacja przepisu oraz wyszukiwanie/edycja/usuwanie przepisu.
-8. Zapisywanie danych analitycznych dotyczących modyfikacji oraz wyszukiwań przepisów do wewnętrznego monitoringu.
-9. Logowanie krytycznych błędów integracji AI do dedykowanej tabeli błędów.
-10. Implementacja polityki RLS, opartej o identyfikator user_id, z możliwością rozszerzenia o dodatkowe role czy uprawnienia.
+8. Logowanie krytycznych błędów integracji AI do dedykowanej tabeli błędów.
+9. Implementacja polityki RLS, opartej o identyfikator user_id, z możliwością rozszerzenia o dodatkowe role czy uprawnienia.
 
 ## 4. Granice produktu
 1. Import przepisów z zewnętrznych adresów URL – nie jest wspierany w MVP.

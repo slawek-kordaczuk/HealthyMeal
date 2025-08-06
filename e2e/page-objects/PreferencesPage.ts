@@ -267,6 +267,11 @@ export class PreferencesPage extends BasePage {
     await this.formContainer.waitFor({ state: "visible" });
     await this.form.waitFor({ state: "visible" });
     await this.submitButton.waitFor({ state: "visible" });
+    await this.page.waitForLoadState("networkidle");
+    await this.page.waitForFunction(() => {
+      const button = document.querySelector('[data-testid="preferences-submit-button"]') as HTMLButtonElement;
+      return button && !button.disabled && !button.textContent?.includes("...");
+    });
   }
 
   async waitForSuccess(): Promise<void> {
@@ -300,7 +305,7 @@ export class PreferencesPage extends BasePage {
 
     await this.page.waitForLoadState("networkidle");
 
-    if (response.status() === 200) {
+    if (response.ok()) {
       await this.waitForSuccess();
       return "success";
     } else {
